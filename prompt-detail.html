@@ -374,11 +374,15 @@
                     fetch(`${API_URL}/likes`).then(r => r.json())
                 ]);
                 
-                // Check bookmark
+                // Check bookmark - filtrar por usuario actual
                 const bookmarkBtn = document.getElementById('bookmarkBtn');
                 const bookmarkIcon = bookmarkBtn.querySelector('.material-symbols-outlined');
-                if (bookmarks.some(b => b.promptId === promptId)) {
-                    bookmarkIcon.style.fontVariationSettings = "'FILL' 1";
+                if (currentUser) {
+                    const userId = currentUser.id || currentUser.email;
+                    const hasBookmarked = bookmarks.some(b => b.promptId === promptId && b.userId === userId);
+                    if (hasBookmarked) {
+                        bookmarkIcon.style.fontVariationSettings = "'FILL' 1";
+                    }
                 }
                 
                 // Check like

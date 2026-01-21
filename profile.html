@@ -417,10 +417,14 @@
                 
                 // Filtrar prompts del usuario actual
                 const userIdentifier = currentUser.username ? '@' + currentUser.username : currentUser.name;
+                const userId = currentUser.id || currentUser.email;
+                
+                // Filtrar bookmarks del usuario actual
+                const userBookmarks = bookmarks.filter(b => b.userId === userId);
                 
                 let displayPrompts = currentTab === 'myPrompts' 
                     ? prompts.filter(p => p.author === userIdentifier)
-                    : prompts.filter(p => bookmarks.some(b => b.promptId === p.id));
+                    : prompts.filter(p => userBookmarks.some(b => b.promptId === p.id));
 
                 if (displayPrompts.length === 0) {
                     container.innerHTML = `

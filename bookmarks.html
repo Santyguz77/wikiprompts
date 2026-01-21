@@ -116,6 +116,14 @@
 
         async function init() {
             try {
+                // Verificar usuario actual
+                const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+                if (!currentUser) {
+                    window.location.href = 'auth.html';
+                    return;
+                }
+                
+                const userId = currentUser.id || currentUser.email;
                 console.log('🔄 Cargando bookmarks del servidor...');
                 
                 const [bookmarks, prompts] = await Promise.all([
@@ -123,15 +131,18 @@
                     fetch(`${API_URL}/prompts`).then(r => r.json())
                 ]);
                 
-                console.log(`✅ Cargados ${bookmarks.length} bookmarks`);
+                // Filtrar solo los bookmarks del usuario actual
+                const userBookmarks = bookmarks.filter(b => b.userId === userId);
                 
-                if (bookmarks.length === 0) {
+                console.log(`✅ Cargados ${userBookmarks.length} bookmarks del usuario`);
+                
+                if (userBookmarks.length === 0) {
                     document.getElementById('emptyState').classList.remove('hidden');
                     document.getElementById('bookmarksList').classList.add('hidden');
                 } else {
                     document.getElementById('emptyState').classList.add('hidden');
                     document.getElementById('bookmarksList').classList.remove('hidden');
-                    renderBookmarks(bookmarks, prompts);
+                    renderBookmarks(userBookmarks, prompts);
                 }
             } catch (error) {
                 console.error('❌ Error cargando datos:', error);
@@ -187,8 +198,13 @@
             event.stopPropagation();
             
             try {
+                const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+                if (!currentUser) return;
+                
+                const userId = currentUser.id || currentUser.email;
                 const bookmarks = await fetch(`${API_URL}/bookmarks`).then(r => r.json());
-                const updated = bookmarks.filter(b => b.promptId !== promptId);
+                // Solo eliminar el bookmark del usuario actual
+                const updated = bookmarks.filter(b => !(b.promptId === promptId && b.userId === userId));
                 
                 await fetch(`${API_URL}/bookmarks`, {
                     method: 'POST',
