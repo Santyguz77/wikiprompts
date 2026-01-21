@@ -13,8 +13,13 @@ const __dirname = dirname(__filename);
 
 const app = express();
 app.use(cors({
-  origin: true,
-  credentials: true
+  origin: (origin, callback) => {
+    // Permitir todas las peticiones (desarrollo)
+    callback(null, true);
+  },
+  credentials: true,
+  exposedHeaders: ['Set-Cookie'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
@@ -24,9 +29,11 @@ app.use(session({
   secret: 'wikiprompts-secret-key-2026',
   resave: false,
   saveUninitialized: false,
+  name: 'wikiprompts.sid',
   cookie: { 
-    secure: false, // cambiar a true en producción con HTTPS
-    httpOnly: true,
+    secure: false,
+    httpOnly: false, // Permitir acceso desde JavaScript
+    sameSite: 'none',
     maxAge: 7 * 24 * 60 * 60 * 1000 // 7 días
   }
 }));
@@ -87,78 +94,46 @@ const ALLOWED_TABLES = new Set([
   "comments",
   "likes",
   "remixes",
-  "categories"
+  "categories",
+  "bookmarks"
 ]);
 
-// Obtener todos los registros
-app.get("/api/:table", async (req, res) => {
-  const { table } = req.params;
-  try {
-    if (!ALLOWED_TABLES.has(table)) return res.status(400).json({ error: "Tabla no permitida" });
-    const rows = await db.all(`SELECT * FROM ${table}`);
-    res.json(rows.map(r => JSON.parse(r.data)));
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-// Guardar lista completa (reemplaza todo)
-app.post("/api/:table", async (req, res) => {
-  const { table } = req.params;
-  const items = req.body;
-  if (!ALLOWED_TABLES.has(table)) return res.status(400).json({ error: "Tabla no permitida" });
-  if (!Array.isArray(items)) return res.status(400).json({ error: "Formato inválido" });
-  try {
-    await db.exec("BEGIN");
-    await db.run(`DELETE FROM ${table}`);
-    const stmt = await db.prepare(`INSERT INTO ${table} (id, data) VALUES (?, ?)`);
-    for (const item of items) {
-      await stmt.run(item.id, JSON.stringify(item));
-    }
-    await stmt.finalize();
-    await db.exec("COMMIT");
-    res.json({ success: true, count: items.length });
-  } catch (err) {
-    try { await db.exec("ROLLBACK"); } catch {}
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Actualizar/crear UN SOLO registro
-app.put("/api/:table/:id", async (req, res) => {
-  const { table, id } = req.params;
-  const item = req.body;
-  if (!ALLOWED_TABLES.has(table)) return res.status(400).json({ error: "Tabla no permitida" });
-  if (!item || !item.id) return res.status(400).json({ error: "Item inválido" });
-  try {
-    await db.run(
-      `INSERT OR REPLACE INTO ${table} (id, data) VALUES (?, ?)`,
-      id,
-      JSON.stringify(item)
-    );
-    res.json({ success: true, id });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Eliminar UN SOLO registro
-app.delete("/api/:table/:id", async (req, res) => {
-  const { table, id } = req.params;
-  if (!ALLOWED_TABLES.has(table)) return res.status(400).json({ error: "Tabla no permitida" });
-  try {
-    await db.run(`DELETE FROM ${table} WHERE id = ?`, id);
-    res.json({ success: true, id });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
 // ==================== RUTAS DE AUTENTICACIÓN ====================
+// IMPORTANTE: Las rutas de autenticación deben ir ANTES de las rutas genéricas
+// para evitar que /api/auth/profile sea interpretado como /api/:table/:id
 
 // Función helper para hashear contraseñas
 function hashPassword(password) {
   return crypto.createHash('sha256').update(password).digest('hex');
+}
+
+// Middleware para verificar autenticación (sesión o token)
+async function requireAuth(req, res, next) {
+  // Verificar sesión primero
+  if (req.session && req.session.userId) {
+    return next();
+  }
+  
+  // Si no hay sesión, verificar header Authorization
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const userId = authHeader.substring(7);
+    try {
+      const user = await db.get(
+        'SELECT id, email, name, username, avatar, bio, createdAt FROM auth_users WHERE id = ?',
+        [userId]
+      );
+      if (user) {
+        req.session.userId = userId;
+        req.session.user = user;
+        return next();
+      }
+    } catch (err) {
+      console.error('Error verificando token:', err);
+    }
+  }
+  
+  return res.status(401).json({ error: "No autenticado" });
 }
 
 // Registro de usuario
@@ -227,7 +202,7 @@ app.post("/api/auth/login", async (req, res) => {
   }
 });
 
-// Login con Google (simplificado - en producción usar OAuth2)
+// Login con Google
 app.post("/api/auth/google", async (req, res) => {
   const { googleId, email, name, avatar } = req.body;
   
@@ -276,11 +251,7 @@ app.post("/api/auth/google", async (req, res) => {
 });
 
 // Obtener usuario actual
-app.get("/api/auth/me", async (req, res) => {
-  if (!req.session.userId) {
-    return res.status(401).json({ error: "No autenticado" });
-  }
-  
+app.get("/api/auth/me", requireAuth, async (req, res) => {
   try {
     const user = await db.get(
       `SELECT id, email, name, username, avatar, bio, createdAt FROM auth_users WHERE id = ?`,
@@ -309,11 +280,7 @@ app.post("/api/auth/logout", (req, res) => {
 });
 
 // Actualizar perfil
-app.put("/api/auth/profile", async (req, res) => {
-  if (!req.session.userId) {
-    return res.status(401).json({ error: "No autenticado" });
-  }
-  
+app.put("/api/auth/profile", requireAuth, async (req, res) => {
   const { name, username, bio, avatar } = req.body;
   
   try {
@@ -363,6 +330,72 @@ app.put("/api/auth/profile", async (req, res) => {
 });
 
 // ==================== FIN RUTAS DE AUTENTICACIÓN ====================
+
+// ==================== RUTAS GENÉRICAS PARA DATOS ====================
+
+// Obtener todos los registros
+app.get("/api/:table", async (req, res) => {
+  const { table } = req.params;
+  try {
+    if (!ALLOWED_TABLES.has(table)) return res.status(400).json({ error: "Tabla no permitida" });
+    const rows = await db.all(`SELECT * FROM ${table}`);
+    res.json(rows.map(r => JSON.parse(r.data)));
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// Guardar lista completa (reemplaza todo)
+app.post("/api/:table", async (req, res) => {
+  const { table } = req.params;
+  const items = req.body;
+  if (!ALLOWED_TABLES.has(table)) return res.status(400).json({ error: "Tabla no permitida" });
+  if (!Array.isArray(items)) return res.status(400).json({ error: "Formato inválido" });
+  try {
+    await db.exec("BEGIN");
+    await db.run(`DELETE FROM ${table}`);
+    const stmt = await db.prepare(`INSERT INTO ${table} (id, data) VALUES (?, ?)`);
+    for (const item of items) {
+      await stmt.run(item.id, JSON.stringify(item));
+    }
+    await stmt.finalize();
+    await db.exec("COMMIT");
+    res.json({ success: true, count: items.length });
+  } catch (err) {
+    try { await db.exec("ROLLBACK"); } catch {}
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Actualizar/crear UN SOLO registro
+app.put("/api/:table/:id", async (req, res) => {
+  const { table, id } = req.params;
+  const item = req.body;
+  if (!ALLOWED_TABLES.has(table)) return res.status(400).json({ error: "Tabla no permitida" });
+  if (!item || !item.id) return res.status(400).json({ error: "Item inválido" });
+  try {
+    await db.run(
+      `INSERT OR REPLACE INTO ${table} (id, data) VALUES (?, ?)`,
+      id,
+      JSON.stringify(item)
+    );
+    res.json({ success: true, id });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Eliminar UN SOLO registro
+app.delete("/api/:table/:id", async (req, res) => {
+  const { table, id } = req.params;
+  if (!ALLOWED_TABLES.has(table)) return res.status(400).json({ error: "Tabla no permitida" });
+  try {
+    await db.run(`DELETE FROM ${table} WHERE id = ?`, id);
+    res.json({ success: true, id });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 const PORT = process.env.PORT || 3009;
 app.listen(PORT, () => {

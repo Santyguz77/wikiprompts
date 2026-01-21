@@ -45,8 +45,8 @@
     </style>
 </head>
 
-<body class="bg-bg-page text-gray-900 font-body selection:bg-gray-200">
-    <div class="relative mx-auto flex h-full min-h-screen w-full max-w-md lg:max-w-5xl flex-col overflow-x-hidden shadow-xl bg-white">
+<body class="bg-bg-page text-gray-900 font-body selection:bg-gray-200 overflow-x-hidden">
+    <div class="relative mx-auto flex h-full min-h-screen w-full max-w-md lg:max-w-none flex-col shadow-xl bg-white">
         
         <!-- Header -->
         <header class="sticky top-0 z-50 flex items-center justify-between p-4 lg:px-12 lg:py-6 bg-white/90 backdrop-blur-md border-b border-gray-100">
@@ -61,31 +61,32 @@
 
         <!-- Main Content -->
         <main class="flex-1 flex flex-col pb-24">
-            <!-- Image Preview (if applicable) -->
-            <div id="imagePreview" class="w-full aspect-[4/3] relative bg-gray-50 hidden">
-                <div id="imageContainer" class="absolute inset-0 bg-cover bg-center"></div>
-                <div class="absolute bottom-4 right-4 flex gap-2">
-                    <button onclick="fullscreenImage()" class="size-10 flex items-center justify-center rounded-full bg-white/90 shadow-sm text-gray-700 hover:text-black transition-colors backdrop-blur-sm">
-                        <span class="material-symbols-outlined text-[20px]">fullscreen</span>
-                    </button>
-                    <button onclick="downloadImage()" class="size-10 flex items-center justify-center rounded-full bg-white/90 shadow-sm text-gray-700 hover:text-black transition-colors backdrop-blur-sm">
-                        <span class="material-symbols-outlined text-[20px]">download</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="px-6 lg:px-12 py-6 lg:py-8 flex flex-col gap-8">
-                <!-- Prompt Content -->
-                <div class="flex flex-col gap-3">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-sm font-bold text-gray-900 uppercase tracking-wide">El Prompt</h2>
-                        <button onclick="copyPrompt()" class="group flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-primary transition-colors">
-                            <span class="material-symbols-outlined text-[18px]">content_copy</span>
-                            <span class="underline decoration-transparent group-hover:decoration-current transition-all">Copiar</span>
+            <div class="px-6 lg:px-12 xl:px-24 py-6 lg:py-8 max-w-5xl lg:mx-auto w-full">
+                <!-- Image Preview (if applicable) -->
+                <div id="imagePreview" class="w-full max-w-2xl mx-auto aspect-video relative bg-gray-50 rounded-2xl overflow-hidden shadow-lg mb-8 hidden">
+                    <div id="imageContainer" class="absolute inset-0 bg-cover bg-center"></div>
+                    <div class="absolute bottom-4 right-4 flex gap-2">
+                        <button onclick="fullscreenImage()" class="size-10 flex items-center justify-center rounded-full bg-white/90 shadow-sm text-gray-700 hover:text-black transition-colors backdrop-blur-sm">
+                            <span class="material-symbols-outlined text-[20px]">fullscreen</span>
+                        </button>
+                        <button onclick="downloadImage()" class="size-10 flex items-center justify-center rounded-full bg-white/90 shadow-sm text-gray-700 hover:text-black transition-colors backdrop-blur-sm">
+                            <span class="material-symbols-outlined text-[20px]">download</span>
                         </button>
                     </div>
-                    <div class="bg-gray-50 p-5 rounded-xl border border-gray-100">
-                        <p id="promptText" class="text-gray-700 text-[15px] leading-relaxed font-mono whitespace-pre-wrap"></p>
+                </div>
+
+                <div class="flex flex-col gap-8">
+                <!-- Prompt Content -->
+                <div class="flex flex-col gap-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-base lg:text-lg font-bold text-gray-900 uppercase tracking-wide">El Prompt</h2>
+                        <button onclick="copyPrompt()" class="group flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-900 hover:text-white rounded-lg transition-all">
+                            <span class="material-symbols-outlined text-[18px]">content_copy</span>
+                            <span>Copiar</span>
+                        </button>
+                    </div>
+                    <div class="bg-gradient-to-br from-gray-50 to-gray-100 p-6 lg:p-8 rounded-2xl border border-gray-200 shadow-sm">
+                        <p id="promptText" class="text-gray-800 text-base lg:text-lg leading-relaxed font-mono break-words overflow-wrap-anywhere"></p>
                     </div>
                 </div>
 
@@ -147,6 +148,7 @@
                         Mostrar todos los comentarios
                     </button>
                 </div>
+                </div>
             </div>
         </main>
 
@@ -160,6 +162,18 @@
 
     <script>
         const API_URL = 'https://sentences-col-vice-antivirus.trycloudflare.com/api';
+
+        let currentUser = null;
+
+        // Verificar autenticación
+        function checkAuth() {
+            const storedUser = localStorage.getItem('currentUser');
+            if (storedUser) {
+                currentUser = JSON.parse(storedUser);
+                return true;
+            }
+            return false;
+        }
 
         // Sample comments data
         const sampleComments = [
@@ -207,6 +221,8 @@
         }
 
         function displayPrompt(prompt) {
+            const isAuthenticated = checkAuth();
+            
             // Display image if exists
             if (prompt.imageUrl) {
                 const imagePreview = document.getElementById('imagePreview');
@@ -216,7 +232,23 @@
             }
 
             // Display prompt text
-            document.getElementById('promptText').textContent = prompt.prompt;
+            const promptTextElement = document.getElementById('promptText');
+            if (isAuthenticated) {
+                promptTextElement.textContent = prompt.prompt;
+            } else {
+                promptTextElement.innerHTML = `
+                    <div class="flex flex-col items-center justify-center gap-4 py-8">
+                        <span class="material-symbols-outlined text-gray-300 text-5xl">lock</span>
+                        <div class="text-center">
+                            <p class="text-gray-900 font-semibold mb-2">Contenido Bloqueado</p>
+                            <p class="text-gray-500 text-sm mb-4">Regístrate o inicia sesión para ver el prompt completo</p>
+                            <button onclick="window.location.href='auth.html'" class="px-6 py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors">
+                                Iniciar Sesión
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
 
             // Display metadata
             const metadata = document.getElementById('metadata');
@@ -289,6 +321,12 @@
         }
 
         function copyPrompt() {
+            if (!checkAuth()) {
+                alert('Debes iniciar sesión para copiar prompts');
+                window.location.href = 'auth.html';
+                return;
+            }
+            
             const promptText = document.getElementById('promptText').textContent;
             navigator.clipboard.writeText(promptText).then(() => {
                 alert('¡Prompt copiado al portapapeles!');
