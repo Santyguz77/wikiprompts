@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="theme-color" content="#000000"/>
+    <title>Iniciar Sesión - Wikiprompts</title>
+    
+    <link rel="manifest" href="/manifest.json"/>
+    <link rel="icon" type="image/png" href="/image.png"/>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0a0a0a", 
+                        "secondary": "#666666",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "body": ["Manrope", "sans-serif"],
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+
+<body class="bg-white text-gray-900 font-body">
+    <div class="relative mx-auto flex h-full min-h-screen w-full max-w-md flex-col overflow-x-hidden bg-white">
+        
+        <!-- Header -->
+        <header class="flex items-center justify-between px-6 pt-12 pb-4">
+            <h1 class="font-display font-bold text-2xl tracking-tighter text-black">Wikiprompts.</h1>
+        </header>
+
+        <!-- Auth Container -->
+        <main class="flex-1 flex flex-col justify-center px-6 pb-12">
+            <!-- Login Form -->
+            <div id="loginForm" class="flex flex-col gap-6">
+                <div class="text-center mb-4">
+                    <h2 class="text-3xl font-display font-bold mb-2">Bienvenido</h2>
+                    <p class="text-gray-500">Inicia sesión para continuar</p>
+                </div>
+
+                <!-- Google Sign In -->
+                <button onclick="handleGoogleSignIn()" class="w-full h-12 px-4 bg-white border-2 border-gray-200 hover:border-gray-300 rounded-xl flex items-center justify-center gap-3 transition-all font-medium">
+                    <svg width="20" height="20" viewBox="0 0 48 48">
+                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                    </svg>
+                    Continuar con Google
+                </button>
+
+                <div class="flex items-center gap-3">
+                    <div class="flex-1 h-px bg-gray-200"></div>
+                    <span class="text-sm text-gray-400">o</span>
+                    <div class="flex-1 h-px bg-gray-200"></div>
+                </div>
+
+                <form onsubmit="handleLogin(event)" class="flex flex-col gap-4">
+                    <div>
+                        <label class="text-sm font-semibold text-gray-700 mb-2 block">Email</label>
+                        <input 
+                            type="email" 
+                            id="loginEmail" 
+                            required
+                            placeholder="tu@email.com"
+                            class="w-full h-12 px-4 bg-white border border-gray-200 rounded-xl focus:border-black focus:ring-0 transition-colors"
+                        />
+                    </div>
+                    <div>
+                        <label class="text-sm font-semibold text-gray-700 mb-2 block">Contraseña</label>
+                        <div class="relative">
+                            <input 
+                                type="password" 
+                                id="loginPassword" 
+                                required
+                                placeholder="••••••••"
+                                class="w-full h-12 px-4 pr-12 bg-white border border-gray-200 rounded-xl focus:border-black focus:ring-0 transition-colors"
+                            />
+                            <button 
+                                type="button" 
+                                onclick="togglePassword('loginPassword', 'loginEye')" 
+                                class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                            >
+                                <span id="loginEye" class="material-symbols-outlined text-[20px]">visibility</span>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full h-12 bg-black text-white rounded-xl font-semibold hover:bg-gray-800 transition-colors">
+                        Iniciar Sesión
+                    </button>
+                </form>
+
+                <p class="text-center text-sm text-gray-600">
+                    ¿No tienes cuenta? 
+                    <button onclick="showRegister()" class="font-semibold text-black hover:underline">Regístrate</button>
+                </p>
+            </div>
+
+            <!-- Register Form -->
+            <div id="registerForm" class="hidden flex-col gap-6">
+                <div class="text-center mb-4">
+                    <h2 class="text-3xl font-display font-bold mb-2">Crear Cuenta</h2>
+                    <p class="text-gray-500">Únete a la comunidad</p>
+                </div>
+
+                <!-- Google Sign In -->
+                <button onclick="handleGoogleSignIn()" class="w-full h-12 px-4 bg-white border-2 border-gray-200 hover:border-gray-300 rounded-xl flex items-center justify-center gap-3 transition-all font-medium">
+                    <svg width="20" height="20" viewBox="0 0 48 48">
+                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                    </svg>
+                    Registrarse con Google
+                </button>
+
+                <div class="flex items-center gap-3">
+                    <div class="flex-1 h-px bg-gray-200"></div>
+                    <span class="text-sm text-gray-400">o</span>
+                    <div class="flex-1 h-px bg-gray-200"></div>
+                </div>
+
+                <form onsubmit="handleRegister(event)" class="flex flex-col gap-4">
+                    <div>
+                        <label class="text-sm font-semibold text-gray-700 mb-2 block">Nombre</label>
+                        <input 
+                            type="text" 
+                            id="registerName" 
+                            required
+                            placeholder="Tu nombre"
+                            class="w-full h-12 px-4 bg-white border border-gray-200 rounded-xl focus:border-black focus:ring-0 transition-colors"
+                        />
+                    </div>
+                    <div>
+                        <label class="text-sm font-semibold text-gray-700 mb-2 block">Username</label>
+                        <input 
+                            type="text" 
+                            id="registerUsername" 
+                            required
+                            placeholder="@tuusername"
+                            class="w-full h-12 px-4 bg-white border border-gray-200 rounded-xl focus:border-black focus:ring-0 transition-colors"
+                        />
+                    </div>
+                    <div>
+                        <label class="text-sm font-semibold text-gray-700 mb-2 block">Email</label>
+                        <input 
+                            type="email" 
+                            id="registerEmail" 
+                            required
+                            placeholder="tu@email.com"
+                            class="w-full h-12 px-4 bg-white border border-gray-200 rounded-xl focus:border-black focus:ring-0 transition-colors"
+                        />
+                    </div>
+                    <div>
+                        <label class="text-sm font-semibold text-gray-700 mb-2 block">Contraseña</label>
+                        <div class="relative">
+                            <input 
+                                type="password" 
+                                id="registerPassword" 
+                                required
+                                placeholder="Mínimo 6 caracteres"
+                                minlength="6"
+                                class="w-full h-12 px-4 pr-12 bg-white border border-gray-200 rounded-xl focus:border-black focus:ring-0 transition-colors"
+                            />
+                            <button 
+                                type="button" 
+                                onclick="togglePassword('registerPassword', 'registerEye')" 
+                                class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                            >
+                                <span id="registerEye" class="material-symbols-outlined text-[20px]">visibility</span>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full h-12 bg-black text-white rounded-xl font-semibold hover:bg-gray-800 transition-colors">
+                        Crear Cuenta
+                    </button>
+                </form>
+
+                <p class="text-center text-sm text-gray-600">
+                    ¿Ya tienes cuenta? 
+                    <button onclick="showLogin()" class="font-semibold text-black hover:underline">Inicia sesión</button>
+                </p>
+            </div>
+
+            <!-- Error Message -->
+            <div id="errorMessage" class="hidden mt-4 p-4 bg-red-50 border border-red-200 rounded-xl">
+                <p class="text-sm text-red-600 font-medium"></p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_URL = 'https://sentences-col-vice-antivirus.trycloudflare.com/api';
+
+        function togglePassword(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.textContent = 'visibility_off';
+            } else {
+                input.type = 'password';
+                icon.textContent = 'visibility';
+            }
+        }
+
+        function showRegister() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
+            document.getElementById('registerForm').classList.add('flex');
+            hideError();
+        }
+
+        function showLogin() {
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('loginForm').classList.add('flex');
+            hideError();
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.querySelector('p').textContent = message;
+            errorDiv.classList.remove('hidden');
+        }
+
+        function hideError() {
+            document.getElementById('errorMessage').classList.add('hidden');
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            hideError();
+
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Guardar usuario en localStorage
+                    localStorage.setItem('currentUser', JSON.stringify(data.user));
+                    window.location.href = 'index.html';
+                } else {
+                    showError(data.error || 'Error al iniciar sesión');
+                }
+            } catch (error) {
+                showError('Error de conexión. Intenta de nuevo.');
+                console.error('Login error:', error);
+            }
+        }
+
+        async function handleRegister(event) {
+            event.preventDefault();
+            hideError();
+
+            const name = document.getElementById('registerName').value;
+            const username = document.getElementById('registerUsername').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+
+            try {
+                const response = await fetch(`${API_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ name, username, email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Guardar usuario en localStorage
+                    localStorage.setItem('currentUser', JSON.stringify(data.user));
+                    window.location.href = 'index.html';
+                } else {
+                    showError(data.error || 'Error al registrarse');
+                }
+            } catch (error) {
+                showError('Error de conexión. Intenta de nuevo.');
+                console.error('Register error:', error);
+            }
+        }
+
+        async function handleGoogleSignIn() {
+            hideError();
+            
+            // Inicializar Google Identity Services
+            google.accounts.id.initialize({
+                client_id: '664887131125-k6e8g4ql92s82a6oiaqn09uq2pk4j31k.apps.googleusercontent.com',
+                callback: handleGoogleCallback
+            });
+
+            // Mostrar el popup de Google Sign In
+            google.accounts.id.prompt();
+        }
+
+        async function handleGoogleCallback(response) {
+            try {
+                // Decodificar el JWT token de Google
+                const credential = response.credential;
+                const payload = JSON.parse(atob(credential.split('.')[1]));
+                
+                console.log('Usuario de Google:', payload);
+                
+                // Enviar al backend
+                const res = await fetch(`${API_URL}/auth/google`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        googleId: payload.sub,
+                        email: payload.email,
+                        name: payload.name,
+                        avatar: payload.picture
+                    })
+                });
+                
+                const data = await res.json();
+                
+                if (res.ok) {
+                    localStorage.setItem('currentUser', JSON.stringify(data.user));
+                    window.location.href = 'index.html';
+                } else {
+                    showError(data.error || 'Error al iniciar sesión con Google');
+                }
+            } catch (error) {
+                showError('Error al procesar login con Google');
+                console.error('Google login error:', error);
+            }
+        }
+
+        // Renderizar botón alternativo de Google
+        function renderGoogleButton() {
+            const loginGoogleBtn = document.querySelector('#loginForm button[onclick="handleGoogleSignIn()"]');
+            const registerGoogleBtn = document.querySelector('#registerForm button[onclick="handleGoogleSignIn()"]');
+            
+            if (loginGoogleBtn) {
+                google.accounts.id.renderButton(
+                    loginGoogleBtn,
+                    { 
+                        theme: "outline", 
+                        size: "large",
+                        width: loginGoogleBtn.offsetWidth,
+                        text: "continue_with"
+                    }
+                );
+            }
+        }
+
+        // Inicializar cuando cargue la página
+        window.addEventListener('load', () => {
+            if (window.google) {
+                google.accounts.id.initialize({
+                    client_id: '664887131125-k6e8g4ql92s82a6oiaqn09uq2pk4j31k.apps.googleusercontent.com',
+                    callback: handleGoogleCallback,
+                    auto_select: false
+                });
+            }
+        });
+    </script>
+</body>
+</html>

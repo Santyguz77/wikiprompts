@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="theme-color" content="#000000"/>
+    <title>Prompt Detail - Wikiprompts</title>
+    
+    <link rel="manifest" href="/manifest.json"/>
+    <link rel="icon" type="image/png" href="/image.png"/>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans:wght@400;500;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2563EB", 
+                        "secondary": "#64748B",
+                        "bg-page": "#FFFFFF",
+                        "bg-subtle": "#F3F4F6",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "body": ["Manrope", "sans-serif"],
+                        "mono": ["Noto Sans Mono", "monospace"],
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "2xl": "2rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+    
+    <style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+
+<body class="bg-bg-page text-gray-900 font-body selection:bg-gray-200">
+    <div class="relative mx-auto flex h-full min-h-screen w-full max-w-md lg:max-w-5xl flex-col overflow-x-hidden shadow-xl bg-white">
+        
+        <!-- Header -->
+        <header class="sticky top-0 z-50 flex items-center justify-between p-4 lg:px-12 lg:py-6 bg-white/90 backdrop-blur-md border-b border-gray-100">
+            <button onclick="goBack()" class="flex size-10 lg:size-12 items-center justify-center rounded-full text-gray-900 hover:bg-gray-100 transition-colors">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </button>
+            <h1 class="text-base lg:text-lg font-semibold font-display tracking-tight text-gray-900">Detalle del Prompt</h1>
+            <button onclick="sharePrompt()" class="flex size-10 lg:size-12 items-center justify-center rounded-full text-gray-900 hover:bg-gray-100 transition-colors">
+                <span class="material-symbols-outlined">share</span>
+            </button>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col pb-24">
+            <!-- Image Preview (if applicable) -->
+            <div id="imagePreview" class="w-full aspect-[4/3] relative bg-gray-50 hidden">
+                <div id="imageContainer" class="absolute inset-0 bg-cover bg-center"></div>
+                <div class="absolute bottom-4 right-4 flex gap-2">
+                    <button onclick="fullscreenImage()" class="size-10 flex items-center justify-center rounded-full bg-white/90 shadow-sm text-gray-700 hover:text-black transition-colors backdrop-blur-sm">
+                        <span class="material-symbols-outlined text-[20px]">fullscreen</span>
+                    </button>
+                    <button onclick="downloadImage()" class="size-10 flex items-center justify-center rounded-full bg-white/90 shadow-sm text-gray-700 hover:text-black transition-colors backdrop-blur-sm">
+                        <span class="material-symbols-outlined text-[20px]">download</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="px-6 lg:px-12 py-6 lg:py-8 flex flex-col gap-8">
+                <!-- Prompt Content -->
+                <div class="flex flex-col gap-3">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-sm font-bold text-gray-900 uppercase tracking-wide">El Prompt</h2>
+                        <button onclick="copyPrompt()" class="group flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined text-[18px]">content_copy</span>
+                            <span class="underline decoration-transparent group-hover:decoration-current transition-all">Copiar</span>
+                        </button>
+                    </div>
+                    <div class="bg-gray-50 p-5 rounded-xl border border-gray-100">
+                        <p id="promptText" class="text-gray-700 text-[15px] leading-relaxed font-mono whitespace-pre-wrap"></p>
+                    </div>
+                </div>
+
+                <!-- Metadata -->
+                <div>
+                    <div id="metadata" class="flex flex-wrap items-start justify-between gap-y-4 py-4 border-t border-b border-gray-100">
+                        <!-- Se llenará dinámicamente -->
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="flex items-center justify-start gap-6 pt-4">
+                        <button onclick="toggleLike()" id="likeBtn" class="flex items-center gap-2 text-gray-500 hover:text-red-500 transition-colors group">
+                            <span class="material-symbols-outlined group-hover:fill-current" style="font-variation-settings: 'FILL' 0;">favorite</span>
+                            <span id="likeCount" class="text-sm">0</span>
+                        </button>
+                        <button class="flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors">
+                            <span class="material-symbols-outlined">chat_bubble</span>
+                            <span id="commentCount" class="text-sm">0</span>
+                        </button>
+                        <button onclick="sharePrompt()" class="flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors ml-auto">
+                            <span class="material-symbols-outlined">ios_share</span>
+                        </button>
+                        <button onclick="toggleBookmark()" id="bookmarkBtn" class="flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors">
+                            <span class="material-symbols-outlined">bookmark</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Community Remixes -->
+                <div class="flex flex-col gap-4" id="remixesSection">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-bold font-display text-gray-900">Remixes de la Comunidad</h3>
+                        <button class="text-xs font-semibold text-gray-500 hover:text-gray-900">Ver Todos</button>
+                    </div>
+                    <div class="flex overflow-x-auto gap-3 no-scrollbar -mx-6 px-6 pb-2">
+                        <div class="flex-shrink-0 w-28 aspect-square rounded-lg bg-gray-100 overflow-hidden relative group">
+                            <div class="absolute inset-0 bg-cover bg-center hover:scale-105 transition-transform duration-500" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBiE8i632sZ_dOfWYD1-M04Jd5eqB10A7GTviuhKePotgc6CkQ4PGTp-rLp1QJIPx0yQLTIDLsU9byUYjZywfZEvKURhJ-RfhUquP-fh_wtg66dzPQOej8MF_uc9TX_ejuPwmYN-Q813EI8aoq5dmKyLmRdS3Y98VPkYNjXAYRd87VfVZkOeyVjmc8cfMFI-6OGKsAqMv3aotivj8tqBbgE1-q--pXYC-Bk2mcO-dB2X_lKxfmAlfco0aOfEJJU8Ku8RzIkx_wbaLWV');"></div>
+                        </div>
+                        <div class="flex-shrink-0 w-28 aspect-square rounded-lg bg-gray-100 overflow-hidden relative group">
+                            <div class="absolute inset-0 bg-cover bg-center hover:scale-105 transition-transform duration-500" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAnyW052ryYH8MigH5K-XafFwituyQp6lq0COHJ9fQ9ETZTKf7nmBCl141oioFhn50UgkWgCsAkvc6w4dru_SbfAH191dE704BcTIW4XR_rGDjmFNWdTG22D_1PG4vxuFXgyz_Jb4dhHDTkDlP04j7SK55AM_E5lWM55nRhqOcNiB12vYuqjMHe0LMuIupn2UY-WLbfJ5aYA9--bsamu2f8MxoDVYPV3bRgPKZB4IOec2MQfadCicSdiRI6skZfjHRejaJYvK5vnVdM');"></div>
+                        </div>
+                        <div class="flex-shrink-0 w-28 aspect-square rounded-lg bg-gray-100 overflow-hidden relative group">
+                            <div class="absolute inset-0 bg-cover bg-center hover:scale-105 transition-transform duration-500" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBKH6-8JnJExGCP9v21fY9J9wp-gyGZZysSUTamV5OR6ujU-ol9EZBY-ztiWyy4uBIBXZ5imsmg17YvgY39HD0Kl8yTY6WWck1gLIk4hRKpglaEYCLsGqiPv3xYW3rKW6Y-KPh6MhKGFkDU3Mjc2LodEgLiD2qXbSuv-KkPpeCu3Fjgc2-5efKXs5evCeF1ISsK3p2eYAV45z6z1Gs6lIU_F1ofqu32xAu7blh4DOfGgw86jVeuynlDI130-_7oEf5XRTd4tKWDDUBG');"></div>
+                        </div>
+                        <button onclick="window.location.href='contribute.html'" class="flex-shrink-0 w-28 aspect-square rounded-lg bg-white border border-dashed border-gray-300 flex flex-col items-center justify-center gap-1 hover:border-gray-400 hover:bg-gray-50 transition-all">
+                            <span class="material-symbols-outlined text-gray-400 text-[24px]">add</span>
+                            <span class="text-[10px] font-medium text-gray-500">Remix</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Comments Section -->
+                <div class="flex flex-col gap-4">
+                    <h3 class="text-lg font-bold font-display text-gray-900">Comentarios Recientes</h3>
+                    <div id="commentsContainer" class="flex flex-col gap-6">
+                        <!-- Se llenará dinámicamente -->
+                    </div>
+                    <button class="self-start text-sm font-semibold text-gray-900 hover:underline mt-2">
+                        Mostrar todos los comentarios
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Floating Action Button -->
+        <div class="fixed bottom-6 right-6 z-50">
+            <button onclick="remixPrompt()" class="flex items-center justify-center size-14 rounded-full bg-black text-white shadow-lg hover:scale-105 transition-transform hover:shadow-xl">
+                <span class="material-symbols-outlined text-[24px]">auto_fix_high</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://sentences-col-vice-antivirus.trycloudflare.com/api';
+
+        // Sample comments data
+        const sampleComments = [
+            {
+                username: 'cyber_artist',
+                avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB9OT8Mm_FDGfpvK-s_yjNZktUN3ijEQWnPRAQpwMQoUzIqQrZNjMA-2ZUuZY2yOGUut0jsMm7cSYV2b7JGyPv2qIJFNZ_uXH1ohzk0InMlNUqNdarcMhXXgSnN0a82OUn9EyGqVbAgYenubkVjEEi9yfWA2r6XMiq3KMzHO30r6MxNrJ0QiTOYJa-hTs3Ak7kOs_lJNumTQmAQQY-pJece283odvKZO_msZHtNSuOCWwwjQGF1pvkPYyBa0FaZElWRQzOi0EPVg8eW',
+                text: 'La iluminación en este es increíble. ¿Usaste algún valor específico de --s?',
+                time: '2h ago'
+            },
+            {
+                username: 'neo_tokyo',
+                avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDH9uj0hfLmX2zNdk7RIFdNbyUh5RZHbGqO8kZDE08qXhSXdh32lMNsyYX-cUWWNsuv5AwM7vmLVL1xe6wboQxT-t9gD_HSGLtKlmsoriVgIe4o0to1xPH1MsJ0AirTIb-3SmLw2mn-0B7W-p_TiuCucs1twUnRPMDZDLfSjxbT7siiBZi_YcBOUUkUfIXRTyjNOjzmLYn_Vrk9ieco8w4Zkg_q_dqav20yImlTML5390ODuptAW0wrSWIYPBjynOAnhAShm0E4KYK3',
+                text: 'Me encantan los reflejos en el pavimento mojado. Midjourney 6 es increíble.',
+                time: '5h ago'
+            }
+        ];
+
+        async function init() {
+            try {
+                const promptId = sessionStorage.getItem('currentPromptId');
+                
+                if (!promptId) {
+                    alert('Prompt no encontrado');
+                    goBack();
+                    return;
+                }
+
+                console.log('🔄 Cargando prompt del servidor...');
+                const prompts = await fetch(`${API_URL}/prompts`).then(r => r.json());
+                const prompt = prompts.find(p => p.id === promptId);
+
+                if (!prompt) {
+                    alert('Prompt no encontrado');
+                    goBack();
+                    return;
+                }
+
+                displayPrompt(prompt);
+                displayComments(sampleComments);
+            } catch (error) {
+                console.error('❌ Error cargando prompt:', error);
+                alert('Error al cargar el prompt');
+                goBack();
+            }
+        }
+
+        function displayPrompt(prompt) {
+            // Display image if exists
+            if (prompt.imageUrl) {
+                const imagePreview = document.getElementById('imagePreview');
+                const imageContainer = document.getElementById('imageContainer');
+                imagePreview.classList.remove('hidden');
+                imageContainer.style.backgroundImage = `url('${prompt.imageUrl}')`;
+            }
+
+            // Display prompt text
+            document.getElementById('promptText').textContent = prompt.prompt;
+
+            // Display metadata
+            const metadata = document.getElementById('metadata');
+            metadata.innerHTML = `
+                <div class="flex flex-col gap-0.5">
+                    <span class="text-[11px] uppercase tracking-wider text-gray-400 font-semibold">Modelo</span>
+                    <span class="text-sm font-medium text-gray-900">${prompt.model}</span>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                    <span class="text-[11px] uppercase tracking-wider text-gray-400 font-semibold">Categoría</span>
+                    <span class="text-sm font-medium text-gray-900">${getCategoryLabel(prompt.category)}</span>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                    <span class="text-[11px] uppercase tracking-wider text-gray-400 font-semibold">Autor</span>
+                    <span class="text-sm font-medium text-gray-900">${prompt.author}</span>
+                </div>
+            `;
+
+            // Display likes
+            document.getElementById('likeCount').textContent = prompt.likes || 0;
+            document.getElementById('commentCount').textContent = sampleComments.length;
+            
+            // Check if bookmarked
+            checkBookmarkStatus(prompt.id);
+        }
+
+        async function checkBookmarkStatus(promptId) {
+            try {
+                const bookmarks = await fetch(`${API_URL}/bookmarks`).then(r => r.json());
+                const bookmarkBtn = document.getElementById('bookmarkBtn');
+                const bookmarkIcon = bookmarkBtn.querySelector('.material-symbols-outlined');
+                if (bookmarks.some(b => b.promptId === promptId)) {
+                    bookmarkIcon.style.fontVariationSettings = "'FILL' 1";
+                }
+            } catch (error) {
+                console.error('❌ Error verificando bookmark:', error);
+            }
+        }
+
+        function displayComments(comments) {
+            const container = document.getElementById('commentsContainer');
+            container.innerHTML = comments.map(comment => `
+                <div class="flex gap-3 items-start">
+                    <div class="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden">
+                        <img alt="${comment.username}" class="w-full h-full object-cover" src="${comment.avatar}"/>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm font-bold text-gray-900">${comment.username}</span>
+                            <span class="text-xs text-gray-400">${comment.time}</span>
+                        </div>
+                        <p class="text-sm text-gray-600 leading-relaxed">${comment.text}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getCategoryLabel(category) {
+            const labels = {
+                'visuals': 'Visuales',
+                'coding': 'Código',
+                'writing': 'Escritura',
+                'marketing': 'Marketing'
+            };
+            return labels[category] || category;
+        }
+
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+
+        function copyPrompt() {
+            const promptText = document.getElementById('promptText').textContent;
+            navigator.clipboard.writeText(promptText).then(() => {
+                alert('¡Prompt copiado al portapapeles!');
+            });
+        }
+
+        function toggleLike() {
+            const likeBtn = document.getElementById('likeBtn');
+            const icon = likeBtn.querySelector('.material-symbols-outlined');
+            const currentFill = icon.style.fontVariationSettings;
+            
+            if (currentFill.includes("'FILL' 1")) {
+                icon.style.fontVariationSettings = "'FILL' 0";
+                likeBtn.classList.remove('text-red-500');
+                likeBtn.classList.add('text-gray-500');
+            } else {
+                icon.style.fontVariationSettings = "'FILL' 1";
+                likeBtn.classList.remove('text-gray-500');
+                likeBtn.classList.add('text-red-500');
+            }
+        }
+
+        async function toggleBookmark() {
+            const bookmarkBtn = document.getElementById('bookmarkBtn');
+            const icon = bookmarkBtn.querySelector('.material-symbols-outlined');
+            const currentFill = icon.style.fontVariationSettings || "'FILL' 0";
+            
+            const promptId = sessionStorage.getItem('currentPromptId');
+            
+            try {
+                let bookmarks = await fetch(`${API_URL}/bookmarks`).then(r => r.json());
+                
+                if (currentFill.includes("'FILL' 1")) {
+                    icon.style.fontVariationSettings = "'FILL' 0";
+                    bookmarks = bookmarks.filter(b => b.promptId !== promptId);
+                } else {
+                    icon.style.fontVariationSettings = "'FILL' 1";
+                    const existingBookmark = bookmarks.find(b => b.promptId === promptId);
+                    if (!existingBookmark) {
+                        bookmarks.push({
+                            id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+                            promptId: promptId,
+                            userId: 'user-1',
+                            createdAt: new Date().toISOString()
+                        });
+                    }
+                }
+                
+                await fetch(`${API_URL}/bookmarks`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bookmarks)
+                });
+                
+                console.log('✅ Bookmark actualizado');
+            } catch (error) {
+                console.error('❌ Error actualizando bookmark:', error);
+            }
+        }
+
+        function sharePrompt() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Mira este prompt en Wikiprompts',
+                    url: window.location.href
+                });
+            } else {
+                alert('Función de compartir no disponible en este navegador');
+            }
+        }
+
+        function remixPrompt() {
+            window.location.href = 'contribute.html';
+        }
+
+        function fullscreenImage() {
+            const imageContainer = document.getElementById('imageContainer');
+            if (imageContainer.requestFullscreen) {
+                imageContainer.requestFullscreen();
+            }
+        }
+
+        function downloadImage() {
+            alert('Función de descarga próximamente');
+        }
+
+        // Initialize on load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>
