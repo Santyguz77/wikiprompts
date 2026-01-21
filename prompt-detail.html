@@ -54,9 +54,14 @@
                 <span class="material-symbols-outlined">arrow_back</span>
             </button>
             <h1 class="text-base lg:text-lg font-semibold font-display tracking-tight text-gray-900">Detalle del Prompt</h1>
-            <button onclick="sharePrompt()" class="flex size-10 lg:size-12 items-center justify-center rounded-full text-gray-900 hover:bg-gray-100 transition-colors">
-                <span class="material-symbols-outlined">share</span>
-            </button>
+            <div class="flex gap-2">
+                <button id="editBtn" onclick="editPrompt()" class="hidden flex size-10 lg:size-12 items-center justify-center rounded-full text-gray-900 hover:bg-gray-100 transition-colors">
+                    <span class="material-symbols-outlined">edit</span>
+                </button>
+                <button onclick="sharePrompt()" class="flex size-10 lg:size-12 items-center justify-center rounded-full text-gray-900 hover:bg-gray-100 transition-colors">
+                    <span class="material-symbols-outlined">share</span>
+                </button>
+            </div>
         </header>
 
         <!-- Main Content -->
@@ -222,6 +227,16 @@
 
         function displayPrompt(prompt) {
             const isAuthenticated = checkAuth();
+            window.currentPrompt = prompt; // Guardar globalmente para editar
+            
+            // Mostrar botón de editar solo si el usuario es el autor
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            if (currentUser) {
+                const userIdentifier = currentUser.username ? '@' + currentUser.username : currentUser.name;
+                if (prompt.author === userIdentifier) {
+                    document.getElementById('editBtn').classList.remove('hidden');
+                }
+            }
             
             // Display image if exists
             if (prompt.imageUrl) {
@@ -400,6 +415,14 @@
 
         function remixPrompt() {
             window.location.href = 'contribute.html';
+        }
+        
+        function editPrompt() {
+            if (!window.currentPrompt) return;
+            
+            // Guardar el prompt actual para edición
+            sessionStorage.setItem('editingPrompt', JSON.stringify(window.currentPrompt));
+            window.location.href = 'contribute.html?edit=true';
         }
 
         function fullscreenImage() {
