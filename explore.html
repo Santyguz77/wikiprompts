@@ -70,128 +70,80 @@
             <section class="px-6 lg:px-12 xl:px-24 py-6 lg:py-8">
                 <div class="flex items-center justify-between mb-5">
                     <h2 class="text-lg font-display font-bold text-gray-900">Tendencias</h2>
-                    <button class="text-xs font-semibold text-gray-500 hover:text-gray-900">Ver Todo</button>
                 </div>
                 
-                <div class="flex flex-col lg:grid lg:grid-cols-2 gap-3 lg:gap-4">
-                    <!-- Trending Item -->
-                    <div class="flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-100 cursor-pointer hover:border-gray-300 hover:shadow-sm transition-all">
-                        <div class="flex-shrink-0 size-10 rounded-full bg-gray-900 flex items-center justify-center text-white font-display font-bold text-sm">
-                            1
-                        </div>
-                        <div class="flex-1">
-                            <h3 class="font-display font-semibold text-sm text-gray-900">Cyberpunk Cityscapes</h3>
-                            <p class="text-xs text-gray-500 mt-0.5">2.4K prompts esta semana</p>
-                        </div>
-                        <span class="material-symbols-outlined text-gray-400">trending_up</span>
-                    </div>
+                <div id="trendingContainer" class="flex flex-col lg:grid lg:grid-cols-2 gap-3 lg:gap-4">
+                    <!-- Se cargará dinámicamente -->
+                </div>
+            </section>
 
-                    <div class="flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-100 cursor-pointer hover:border-gray-300 hover:shadow-sm transition-all">
-                        <div class="flex-shrink-0 size-10 rounded-full bg-gray-900 flex items-center justify-center text-white font-display font-bold text-sm">
-                            2
-                        </div>
-                        <div class="flex-1">
-                            <h3 class="font-display font-semibold text-sm text-gray-900">GPT-4 Writing</h3>
-                            <p class="text-xs text-gray-500 mt-0.5">1.8K prompts esta semana</p>
-                        </div>
-                        <span class="material-symbols-outlined text-gray-400">trending_up</span>
-                    </div>
-
-                    <div class="flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-100 cursor-pointer hover:border-gray-300 hover:shadow-sm transition-all">
-                        <div class="flex-shrink-0 size-10 rounded-full bg-gray-900 flex items-center justify-center text-white font-display font-bold text-sm">
-                            3
-                        </div>
-                        <div class="flex-1">
-                            <h3 class="font-display font-semibold text-sm text-gray-900">Code Generation</h3>
-                            <p class="text-xs text-gray-500 mt-0.5">1.5K prompts esta semana</p>
-                        </div>
-                        <span class="material-symbols-outlined text-gray-400">trending_up</span>
-                    </div>
+            <!-- Most Popular Prompts -->
+            <section class="px-6 lg:px-12 xl:px-24 py-6 lg:py-8 bg-gray-50">
+                <div class="flex items-center justify-between mb-5">
+                    <h2 class="text-lg lg:text-xl font-display font-bold text-gray-900">Más Populares</h2>
+                </div>
+                
+                <div id="popularPromptsGrid" class="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-5 lg:gap-x-6 gap-y-10 lg:gap-y-12">
+                    <!-- Se cargará dinámicamente -->
                 </div>
             </section>
 
             <!-- Popular Creators -->
-            <section class="px-6 lg:px-12 xl:px-24 py-6 lg:py-8 bg-gray-50">
+            <section class="px-6 lg:px-12 xl:px-24 py-6 lg:py-8 bg-white">
                 <div class="flex items-center justify-between mb-5">
                     <h2 class="text-lg lg:text-xl font-display font-bold text-gray-900">Creadores Populares</h2>
                 </div>
                 
-                <div class="flex overflow-x-auto gap-4 -mx-6 px-6 pb-2 no-scrollbar">
-                    <div class="flex-shrink-0 w-32 flex flex-col items-center gap-3 cursor-pointer">
-                        <div class="size-20 rounded-full bg-black p-0.5">
-                            <div class="size-full rounded-full bg-cover bg-center border-2 border-white" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCxjEKnNzaMdO857guFeZmv5otPJbee4WeCKtkHrVhEbq1UW0r9iFlGqpIQEYVIgj3I-rS4hmbT6X1WPQ98y0fXb-33SJOkdaHdfP_PwJWZIhw0g048wrGnLRL_jVfXEC7gVBmoCl09o2hiwGsddwprMxpE7GQcx3N5umE06kVxBibfZnUA05Pch4DRTpTwebgkva9kh5DslfahnyxiNE-EEuY0tRyYzi5LjxU8Lnxvl1iukSRCq-PG5o87c1WRxF_PfPLpMiRCBLw6');"></div>
-                        </div>
-                        <div class="text-center">
-                            <p class="font-semibold text-xs text-gray-900">Elena F.</p>
-                            <p class="text-[10px] text-gray-500">1.2K seguidores</p>
-                        </div>
-                    </div>
+                <div id="creatorsContainer" class="flex overflow-x-auto gap-4 -mx-6 px-6 pb-2 no-scrollbar">
+                    <!-- Se cargará dinámicamente -->
+                </div>
+            </section>
 
-                    <div class="flex-shrink-0 w-32 flex flex-col items-center gap-3 cursor-pointer">
-                        <div class="size-20 rounded-full bg-gray-200 p-0.5">
-                            <div class="size-full rounded-full bg-gray-100 border-2 border-white flex items-center justify-center">
-                                <span class="material-symbols-outlined text-gray-400 text-3xl">person</span>
-                            </div>
-                        </div>
-                        <div class="text-center">
-                            <p class="font-semibold text-xs text-gray-900">Alex M.</p>
-                            <p class="text-[10px] text-gray-500">980 seguidores</p>
-                        </div>
-                    </div>
-
-                    <div class="flex-shrink-0 w-32 flex flex-col items-center gap-3 cursor-pointer">
-                        <div class="size-20 rounded-full bg-gray-200 p-0.5">
-                            <div class="size-full rounded-full bg-gray-100 border-2 border-white flex items-center justify-center">
-                                <span class="material-symbols-outlined text-gray-400 text-3xl">person</span>
-                            </div>
-                        </div>
-                        <div class="text-center">
-                            <p class="font-semibold text-xs text-gray-900">Sarah K.</p>
-                            <p class="text-[10px] text-gray-500">856 seguidores</p>
+            <!-- Creator Prompts Section -->
+            <section id="creatorPromptsSection" class="hidden px-6 lg:px-12 xl:px-24 py-6 lg:py-8 bg-gray-50 border-t border-gray-100">
+                <div class="flex items-center justify-between mb-5">
+                    <div class="flex items-center gap-3">
+                        <button onclick="closeCreatorView()" class="flex items-center justify-center size-8 rounded-full hover:bg-gray-100 transition-colors">
+                            <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+                        </button>
+                        <div>
+                            <h2 id="creatorName" class="text-lg lg:text-xl font-display font-bold text-gray-900"></h2>
+                            <p id="creatorPromptCount" class="text-xs text-gray-500"></p>
                         </div>
                     </div>
+                </div>
+                
+                <div id="creatorPromptsGrid" class="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-5 lg:gap-x-6 gap-y-10 lg:gap-y-12">
+                    <!-- Se cargará dinámicamente -->
                 </div>
             </section>
 
             <!-- Categories Deep Dive -->
-            <section class="px-6 lg:px-12 xl:px-24 py-6 lg:py-8">
+            <section id="categoriesSection" class="px-6 lg:px-12 xl:px-24 py-6 lg:py-8">
                 <h2 class="text-lg lg:text-xl font-display font-bold text-gray-900 mb-5">Categorías</h2>
                 
-                <div class="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 lg:gap-4">
-                    <div class="aspect-square rounded-xl bg-gray-900 p-5 flex flex-col justify-between cursor-pointer hover:bg-gray-800 transition-all">
-                        <span class="material-symbols-outlined text-white text-[32px]">palette</span>
-                        <div>
-                            <h3 class="font-display font-bold text-white">Visuales</h3>
-                            <p class="text-xs text-white/60 mt-1">4.2K prompts</p>
-                        </div>
-                    </div>
-
-                    <div class="aspect-square rounded-xl bg-gray-900 p-5 flex flex-col justify-between cursor-pointer hover:bg-gray-800 transition-all">
-                        <span class="material-symbols-outlined text-white text-[32px]">code</span>
-                        <div>
-                            <h3 class="font-display font-bold text-white">Código</h3>
-                            <p class="text-xs text-white/60 mt-1">2.8K prompts</p>
-                        </div>
-                    </div>
-
-                    <div class="aspect-square rounded-xl bg-gray-900 p-5 flex flex-col justify-between cursor-pointer hover:bg-gray-800 transition-all">
-                        <span class="material-symbols-outlined text-white text-[32px]">edit_note</span>
-                        <div>
-                            <h3 class="font-display font-bold text-white">Escritura</h3>
-                            <p class="text-xs text-white/60 mt-1">3.5K prompts</p>
-                        </div>
-                    </div>
-
-                    <div class="aspect-square rounded-xl bg-gray-900 p-5 flex flex-col justify-between cursor-pointer hover:bg-gray-800 transition-all">
-                        <span class="material-symbols-outlined text-white text-[32px]">campaign</span>
-                        <div>
-                            <h3 class="font-display font-bold text-white">Marketing</h3>
-                            <p class="text-xs text-white/60 mt-1">1.9K prompts</p>
-                        </div>
-                    </div>
+                <div id="categoriesGrid" class="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 lg:gap-4">
+                    <!-- Se cargará dinámicamente -->
                 </div>
             </section>
         </main>
+
+        <!-- Footer -->
+        <footer class="mt-16 lg:mt-24 px-6 lg:px-12 xl:px-24 py-8 lg:py-12 border-t border-gray-100 bg-white">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex flex-col items-center lg:items-start gap-4">
+                    <h3 class="font-display font-bold text-xl text-black">Wikiprompts</h3>
+                    <p class="text-sm text-gray-500 text-center lg:text-left max-w-md">
+                        La mejor comunidad para compartir y descubrir prompts de IA
+                    </p>
+                </div>
+                <div class="mt-8 pt-6 border-t border-gray-100 text-center">
+                    <p class="text-sm text-gray-500">
+                        © 2026 Wikiprompts. Todos los derechos reservados.
+                    </p>
+                </div>
+            </div>
+        </footer>
 
         <!-- Bottom Navigation (Mobile Only) -->
         <nav class="lg:hidden fixed bottom-8 left-1/2 -translate-x-1/2 w-auto bg-white/80 backdrop-blur-xl border border-white/20 ring-1 ring-black/5 rounded-full shadow-subtle h-14 flex items-center justify-center px-2 gap-1 z-50">
@@ -227,5 +179,252 @@
             scrollbar-width: none;
         }
     </style>
+
+    <script>
+        const API_URL = 'https://sentences-col-vice-antivirus.trycloudflare.com/api';
+        let prompts = [];
+
+        // Cargar datos del servidor
+        async function loadData() {
+            try {
+                const response = await fetch(`${API_URL}/prompts`);
+                if (!response.ok) throw new Error('Error al cargar prompts');
+                prompts = await response.json();
+                
+                renderTrending();
+                renderPopularPrompts();
+                renderPopularCreators();
+                renderCategories();
+            } catch (error) {
+                console.error('Error al cargar datos:', error);
+            }
+        }
+
+        // Crear tarjeta de prompt
+        function createPromptCard(prompt) {
+            const imageUrl = prompt.images?.[0] || prompt.imageUrl || '';
+            
+            if (prompt.type === 'image') {
+                return `
+                    <article class="group flex flex-col gap-3 cursor-pointer" onclick="viewPrompt('${prompt.id}')">
+                        <div class="relative aspect-[3/4] rounded-2xl overflow-hidden bg-gray-50 ring-1 ring-black/5">
+                            <img alt="${prompt.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="${imageUrl}"/>
+                            <div class="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-2 py-0.5 rounded-full shadow-sm">
+                                <span class="text-[9px] font-bold uppercase tracking-wider text-black">${prompt.model}</span>
+                            </div>
+                            ${prompt.likes ? `
+                                <div class="absolute top-3 right-3 bg-black/80 backdrop-blur-md px-2 py-1 rounded-full flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-white text-[12px]">favorite</span>
+                                    <span class="text-[9px] font-bold text-white">${prompt.likes}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="flex flex-col gap-0.5 px-1">
+                            <h3 class="font-display font-semibold text-[15px] leading-tight text-primary group-hover:text-gray-600 transition-colors">${prompt.title}</h3>
+                            <p class="text-[11px] font-medium text-gray-400">${prompt.author || 'Anónimo'}</p>
+                        </div>
+                    </article>
+                `;
+            } else if (prompt.type === 'text') {
+                return `
+                    <article class="group flex flex-col gap-3 cursor-pointer" onclick="viewPrompt('${prompt.id}')">
+                        <div class="relative aspect-[3/4] rounded-2xl bg-white border border-gray-100 p-5 flex flex-col justify-between hover:shadow-sm hover:border-gray-200 transition-all">
+                            <div class="flex justify-between items-start">
+                                <div class="w-2 h-2 rounded-full bg-black"></div>
+                                ${prompt.likes ? `
+                                    <div class="bg-gray-100 px-2 py-1 rounded-full flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-gray-600 text-[12px]">favorite</span>
+                                        <span class="text-[9px] font-bold text-gray-600">${prompt.likes}</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            <p class="font-body text-[11px] leading-relaxed text-gray-500 line-clamp-6">
+                                <span class="font-semibold text-black">Prompt:</span> ${prompt.prompt.substring(0, 150)}...
+                            </p>
+                            <div class="bg-gray-50 px-2 py-1 rounded-md self-start border border-gray-100">
+                                <span class="text-[9px] font-bold uppercase tracking-wider text-gray-400">${prompt.model}</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-0.5 px-1">
+                            <h3 class="font-display font-semibold text-[15px] leading-tight text-primary group-hover:text-gray-600 transition-colors">${prompt.title}</h3>
+                            <p class="text-[11px] font-medium text-gray-400">${prompt.author || 'Anónimo'}</p>
+                        </div>
+                    </article>
+                `;
+            } else if (prompt.type === 'code') {
+                return `
+                    <article class="group flex flex-col gap-3 cursor-pointer" onclick="viewPrompt('${prompt.id}')">
+                        <div class="relative aspect-[3/4] rounded-2xl bg-gray-900 p-5 flex flex-col overflow-hidden shadow-lg shadow-gray-200">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center gap-1.5 opacity-50">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
+                                    <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
+                                </div>
+                                ${prompt.likes ? `
+                                    <div class="bg-white/20 backdrop-blur-md px-2 py-1 rounded-full flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-white text-[12px]">favorite</span>
+                                        <span class="text-[9px] font-bold text-white">${prompt.likes}</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            <div class="font-mono text-[10px] text-gray-400 leading-relaxed">
+                                ${prompt.codePreview ? prompt.codePreview.split('\n').slice(0, 4).map(line => `<div>${line}</div>`).join('') : ''}
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-0.5 px-1">
+                            <h3 class="font-display font-semibold text-[15px] leading-tight text-primary group-hover:text-gray-600 transition-colors">${prompt.title}</h3>
+                            <p class="text-[11px] font-medium text-gray-400">${prompt.model}</p>
+                        </div>
+                    </article>
+                `;
+            }
+        }
+
+        // Renderizar tendencias
+        function renderTrending() {
+            const categoryCounts = {};
+            prompts.forEach(prompt => {
+                categoryCounts[prompt.category] = (categoryCounts[prompt.category] || 0) + 1;
+            });
+
+            const trending = Object.entries(categoryCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3);
+
+            const categoryNames = {
+                'visuals': 'Imágenes Visuales',
+                'coding': 'Generación de Código',
+                'writing': 'Escritura con IA',
+                'marketing': 'Marketing Digital'
+            };
+
+            const html = trending.map(([category, count], index) => `
+                <div onclick="filterByCategory('${category}')" class="flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-100 cursor-pointer hover:border-gray-300 hover:shadow-sm transition-all">
+                    <div class="flex-shrink-0 size-10 rounded-full bg-gray-900 flex items-center justify-center text-white font-display font-bold text-sm">
+                        ${index + 1}
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-display font-semibold text-sm text-gray-900">${categoryNames[category] || category}</h3>
+                        <p class="text-xs text-gray-500 mt-0.5">${count} prompts disponibles</p>
+                    </div>
+                    <span class="material-symbols-outlined text-gray-400">trending_up</span>
+                </div>
+            `).join('');
+
+            document.getElementById('trendingContainer').innerHTML = html;
+        }
+
+        // Renderizar prompts más populares
+        function renderPopularPrompts() {
+            const topPrompts = [...prompts]
+                .sort((a, b) => (b.likes || 0) - (a.likes || 0))
+                .slice(0, 6);
+
+            const html = topPrompts.map(prompt => createPromptCard(prompt)).join('');
+            document.getElementById('popularPromptsGrid').innerHTML = html;
+        }
+
+        // Renderizar creadores populares
+        function renderPopularCreators() {
+            const authorCounts = {};
+            prompts.forEach(prompt => {
+                if (prompt.author) {
+                    authorCounts[prompt.author] = (authorCounts[prompt.author] || 0) + 1;
+                }
+            });
+
+            const topCreators = Object.entries(authorCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+
+            const colors = ['bg-red-500', 'bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-yellow-500'];
+
+            const html = topCreators.map(([author, count], index) => {
+                const color = colors[index % colors.length];
+                const initial = author.charAt(0).toUpperCase();
+
+                return `
+                    <div onclick="showCreatorPrompts('${author}')" class="flex-shrink-0 w-32 flex flex-col items-center gap-3 cursor-pointer hover:scale-105 transition-transform">
+                        <div class="size-20 rounded-full bg-black p-0.5">
+                            <div class="size-full rounded-full ${color} border-2 border-white flex items-center justify-center">
+                                <span class="text-white font-display font-bold text-2xl">${initial}</span>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <p class="font-semibold text-xs text-gray-900">${author}</p>
+                            <p class="text-[10px] text-gray-500">${count} prompts</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('creatorsContainer').innerHTML = html;
+        }
+
+        // Renderizar categorías
+        function renderCategories() {
+            const categoryCounts = {};
+            prompts.forEach(prompt => {
+                categoryCounts[prompt.category] = (categoryCounts[prompt.category] || 0) + 1;
+            });
+
+            const categories = [
+                { name: 'Visuales', icon: 'palette', key: 'visuals' },
+                { name: 'Código', icon: 'code', key: 'coding' },
+                { name: 'Escritura', icon: 'edit_note', key: 'writing' },
+                { name: 'Marketing', icon: 'campaign', key: 'marketing' }
+            ];
+
+            const html = categories.map(cat => `
+                <div onclick="filterByCategory('${cat.key}')" class="aspect-square rounded-xl bg-gray-900 p-5 flex flex-col justify-between cursor-pointer hover:bg-gray-800 transition-all hover:scale-105">
+                    <span class="material-symbols-outlined text-white text-[32px]">${cat.icon}</span>
+                    <div>
+                        <h3 class="font-display font-bold text-white">${cat.name}</h3>
+                        <p class="text-xs text-white/60 mt-1">${categoryCounts[cat.key] || 0} prompts</p>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('categoriesGrid').innerHTML = html;
+        }
+
+        // Mostrar prompts del creador
+        function showCreatorPrompts(author) {
+            const authorPrompts = prompts.filter(p => p.author === author);
+            
+            document.getElementById('creatorName').textContent = author;
+            document.getElementById('creatorPromptCount').textContent = `${authorPrompts.length} prompts publicados`;
+            
+            const html = authorPrompts.map(prompt => createPromptCard(prompt)).join('');
+            document.getElementById('creatorPromptsGrid').innerHTML = html;
+            
+            document.getElementById('creatorPromptsSection').classList.remove('hidden');
+            document.getElementById('categoriesSection').classList.add('hidden');
+            
+            document.getElementById('creatorPromptsSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Cerrar vista de creador
+        function closeCreatorView() {
+            document.getElementById('creatorPromptsSection').classList.add('hidden');
+            document.getElementById('categoriesSection').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Filtrar por categoría
+        function filterByCategory(category) {
+            localStorage.setItem('filterCategory', category);
+            window.location.href = 'index.html';
+        }
+
+        // Ver prompt
+        function viewPrompt(promptId) {
+            sessionStorage.setItem('currentPromptId', promptId);
+            window.location.href = 'prompt-detail.html';
+        }
+
+        // Inicializar
+        window.addEventListener('DOMContentLoaded', loadData);
+    </script>
 </body>
 </html>

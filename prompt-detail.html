@@ -46,6 +46,41 @@
 </head>
 
 <body class="bg-bg-page text-gray-900 font-body selection:bg-gray-200 overflow-x-hidden">
+    <!-- Modal de confirmación personalizado -->
+    <div id="confirmModal" class="hidden fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden transform transition-all">
+            <div class="p-6">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="flex items-center justify-center w-12 h-12 rounded-full bg-red-100">
+                        <span class="material-symbols-outlined text-red-600 text-2xl">warning</span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900" id="confirmTitle">Confirmar acción</h3>
+                    </div>
+                </div>
+                <p class="text-gray-600 text-sm leading-relaxed mb-6" id="confirmMessage">
+                    ¿Estás seguro de que quieres continuar?
+                </p>
+                <div class="flex gap-3">
+                    <button onclick="cancelConfirm()" class="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+                        Cancelar
+                    </button>
+                    <button onclick="acceptConfirm()" class="flex-1 px-4 py-2.5 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-colors">
+                        Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast de notificación -->
+    <div id="toast" class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-[10000] transform transition-all duration-300">
+        <div class="bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 min-w-[280px]">
+            <span class="material-symbols-outlined text-[20px]">check_circle</span>
+            <span id="toastMessage" class="text-sm font-medium">Acción completada</span>
+        </div>
+    </div>
+
     <div class="relative mx-auto flex h-full min-h-screen w-full max-w-md lg:max-w-none flex-col shadow-xl bg-white">
         
         <!-- Header -->
@@ -120,38 +155,41 @@
                     </div>
                 </div>
 
-                <!-- Community Remixes -->
-                <div class="flex flex-col gap-4" id="remixesSection">
+                <!-- More from Category -->
+                <div class="flex flex-col gap-4" id="relatedPromptsSection">
                     <div class="flex items-center justify-between">
-                        <h3 class="text-lg font-bold font-display text-gray-900">Remixes de la Comunidad</h3>
-                        <button class="text-xs font-semibold text-gray-500 hover:text-gray-900">Ver Todos</button>
+                        <h3 class="text-lg font-bold font-display text-gray-900">Más de <span id="categoryName"></span></h3>
                     </div>
-                    <div class="flex overflow-x-auto gap-3 no-scrollbar -mx-6 px-6 pb-2">
-                        <div class="flex-shrink-0 w-28 aspect-square rounded-lg bg-gray-100 overflow-hidden relative group">
-                            <div class="absolute inset-0 bg-cover bg-center hover:scale-105 transition-transform duration-500" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBiE8i632sZ_dOfWYD1-M04Jd5eqB10A7GTviuhKePotgc6CkQ4PGTp-rLp1QJIPx0yQLTIDLsU9byUYjZywfZEvKURhJ-RfhUquP-fh_wtg66dzPQOej8MF_uc9TX_ejuPwmYN-Q813EI8aoq5dmKyLmRdS3Y98VPkYNjXAYRd87VfVZkOeyVjmc8cfMFI-6OGKsAqMv3aotivj8tqBbgE1-q--pXYC-Bk2mcO-dB2X_lKxfmAlfco0aOfEJJU8Ku8RzIkx_wbaLWV');"></div>
-                        </div>
-                        <div class="flex-shrink-0 w-28 aspect-square rounded-lg bg-gray-100 overflow-hidden relative group">
-                            <div class="absolute inset-0 bg-cover bg-center hover:scale-105 transition-transform duration-500" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAnyW052ryYH8MigH5K-XafFwituyQp6lq0COHJ9fQ9ETZTKf7nmBCl141oioFhn50UgkWgCsAkvc6w4dru_SbfAH191dE704BcTIW4XR_rGDjmFNWdTG22D_1PG4vxuFXgyz_Jb4dhHDTkDlP04j7SK55AM_E5lWM55nRhqOcNiB12vYuqjMHe0LMuIupn2UY-WLbfJ5aYA9--bsamu2f8MxoDVYPV3bRgPKZB4IOec2MQfadCicSdiRI6skZfjHRejaJYvK5vnVdM');"></div>
-                        </div>
-                        <div class="flex-shrink-0 w-28 aspect-square rounded-lg bg-gray-100 overflow-hidden relative group">
-                            <div class="absolute inset-0 bg-cover bg-center hover:scale-105 transition-transform duration-500" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBKH6-8JnJExGCP9v21fY9J9wp-gyGZZysSUTamV5OR6ujU-ol9EZBY-ztiWyy4uBIBXZ5imsmg17YvgY39HD0Kl8yTY6WWck1gLIk4hRKpglaEYCLsGqiPv3xYW3rKW6Y-KPh6MhKGFkDU3Mjc2LodEgLiD2qXbSuv-KkPpeCu3Fjgc2-5efKXs5evCeF1ISsK3p2eYAV45z6z1Gs6lIU_F1ofqu32xAu7blh4DOfGgw86jVeuynlDI130-_7oEf5XRTd4tKWDDUBG');"></div>
-                        </div>
-                        <button onclick="window.location.href='contribute.html'" class="flex-shrink-0 w-28 aspect-square rounded-lg bg-white border border-dashed border-gray-300 flex flex-col items-center justify-center gap-1 hover:border-gray-400 hover:bg-gray-50 transition-all">
-                            <span class="material-symbols-outlined text-gray-400 text-[24px]">add</span>
-                            <span class="text-[10px] font-medium text-gray-500">Remix</span>
-                        </button>
+                    <div id="relatedPromptsGrid" class="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-8">
+                        <!-- Se cargará dinámicamente -->
                     </div>
                 </div>
 
                 <!-- Comments Section -->
                 <div class="flex flex-col gap-4">
-                    <h3 class="text-lg font-bold font-display text-gray-900">Comentarios Recientes</h3>
+                    <h3 class="text-lg font-bold font-display text-gray-900">Comentarios</h3>
+                    
+                    <!-- Add Comment Form -->
+                    <div id="addCommentSection" class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <textarea 
+                            id="commentInput" 
+                            placeholder="Escribe un comentario..."
+                            rows="3"
+                            class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:border-black focus:ring-0 transition-colors text-sm resize-none"
+                        ></textarea>
+                        <div class="flex justify-end gap-2 mt-3">
+                            <button 
+                                onclick="addComment()" 
+                                class="px-5 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
+                            >
+                                Publicar
+                            </button>
+                        </div>
+                    </div>
+                    
                     <div id="commentsContainer" class="flex flex-col gap-6">
                         <!-- Se llenará dinámicamente -->
                     </div>
-                    <button class="self-start text-sm font-semibold text-gray-900 hover:underline mt-2">
-                        Mostrar todos los comentarios
-                    </button>
                 </div>
                 </div>
             </div>
@@ -178,6 +216,29 @@
                 return true;
             }
             return false;
+        }
+        
+        // Sistema de confirmación modal personalizado
+        let confirmCallback = null;
+        
+        function showConfirm(title, message, onConfirm) {
+            document.getElementById('confirmTitle').textContent = title;
+            document.getElementById('confirmMessage').textContent = message;
+            confirmCallback = onConfirm;
+            document.getElementById('confirmModal').classList.remove('hidden');
+        }
+        
+        function cancelConfirm() {
+            document.getElementById('confirmModal').classList.add('hidden');
+            confirmCallback = null;
+        }
+        
+        function acceptConfirm() {
+            document.getElementById('confirmModal').classList.add('hidden');
+            if (confirmCallback) {
+                confirmCallback();
+                confirmCallback = null;
+            }
         }
 
         // Sample comments data
@@ -207,7 +268,11 @@
                 }
 
                 console.log('🔄 Cargando prompt del servidor...');
-                const prompts = await fetch(`${API_URL}/prompts`).then(r => r.json());
+                const [prompts, comments] = await Promise.all([
+                    fetch(`${API_URL}/prompts`).then(r => r.json()),
+                    fetch(`${API_URL}/comments`).then(r => r.json())
+                ]);
+                
                 const prompt = prompts.find(p => p.id === promptId);
 
                 if (!prompt) {
@@ -217,7 +282,11 @@
                 }
 
                 displayPrompt(prompt);
-                displayComments(sampleComments);
+                
+                // Filtrar comentarios de este prompt
+                const promptComments = comments.filter(c => c.promptId === promptId);
+                displayComments(promptComments);
+                document.getElementById('commentCount').textContent = promptComments.length;
             } catch (error) {
                 console.error('❌ Error cargando prompt:', error);
                 alert('Error al cargar el prompt');
@@ -288,37 +357,185 @@
             
             // Check if bookmarked
             checkBookmarkStatus(prompt.id);
+            
+            // Load related prompts from same category
+            loadRelatedPrompts(prompt.category, prompt.id);
         }
 
         async function checkBookmarkStatus(promptId) {
             try {
-                const bookmarks = await fetch(`${API_URL}/bookmarks`).then(r => r.json());
+                const [bookmarks, likes] = await Promise.all([
+                    fetch(`${API_URL}/bookmarks`).then(r => r.json()),
+                    fetch(`${API_URL}/likes`).then(r => r.json())
+                ]);
+                
+                // Check bookmark
                 const bookmarkBtn = document.getElementById('bookmarkBtn');
                 const bookmarkIcon = bookmarkBtn.querySelector('.material-symbols-outlined');
                 if (bookmarks.some(b => b.promptId === promptId)) {
                     bookmarkIcon.style.fontVariationSettings = "'FILL' 1";
                 }
+                
+                // Check like
+                if (currentUser) {
+                    const userId = currentUser.id || currentUser.email;
+                    const hasLiked = likes.some(l => l.promptId === promptId && l.userId === userId);
+                    if (hasLiked) {
+                        const likeBtn = document.getElementById('likeBtn');
+                        const likeIcon = likeBtn.querySelector('.material-symbols-outlined');
+                        likeIcon.style.fontVariationSettings = "'FILL' 1";
+                        likeBtn.classList.remove('text-gray-500');
+                        likeBtn.classList.add('text-red-500');
+                    }
+                }
             } catch (error) {
-                console.error('❌ Error verificando bookmark:', error);
+                console.error('❌ Error verificando bookmark/like:', error);
             }
         }
 
         function displayComments(comments) {
             const container = document.getElementById('commentsContainer');
-            container.innerHTML = comments.map(comment => `
-                <div class="flex gap-3 items-start">
-                    <div class="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden">
-                        <img alt="${comment.username}" class="w-full h-full object-cover" src="${comment.avatar}"/>
+            
+            if (comments.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-400">
+                        <span class="material-symbols-outlined text-4xl mb-2">chat_bubble</span>
+                        <p class="text-sm">Aún no hay comentarios. ¡Sé el primero!</p>
                     </div>
-                    <div class="flex flex-col gap-1">
-                        <div class="flex items-center gap-2">
-                            <span class="text-sm font-bold text-gray-900">${comment.username}</span>
-                            <span class="text-xs text-gray-400">${comment.time}</span>
+                `;
+                return;
+            }
+            
+            container.innerHTML = comments.map(comment => {
+                const timeAgo = getTimeAgo(comment.createdAt);
+                const avatar = comment.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.username)}&background=random`;
+                
+                // Verificar si es el comentario del usuario actual
+                const isOwn = currentUser && (
+                    comment.userId === (currentUser.id || currentUser.email) ||
+                    comment.username === currentUser.username ||
+                    comment.username === currentUser.name
+                );
+                
+                const deleteButton = isOwn ? `
+                    <button 
+                        onclick="deleteComment('${comment.id}')" 
+                        class="text-red-500 hover:text-red-700 transition-colors"
+                        title="Borrar comentario"
+                    >
+                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                    </button>
+                ` : '';
+                
+                return `
+                    <div class="flex gap-3 items-start">
+                        <div class="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden">
+                            <img alt="${comment.username}" class="w-full h-full object-cover" src="${avatar}"/>
                         </div>
-                        <p class="text-sm text-gray-600 leading-relaxed">${comment.text}</p>
+                        <div class="flex flex-col gap-1 flex-1">
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm font-bold text-gray-900">${comment.username}</span>
+                                <span class="text-xs text-gray-400">${timeAgo}</span>
+                                ${deleteButton}
+                            </div>
+                            <p class="text-sm text-gray-600 leading-relaxed">${comment.text}</p>
+                        </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
+        }
+        
+        async function deleteComment(commentId) {
+            showConfirm(
+                'Eliminar comentario',
+                '¿Estás seguro de que quieres borrar este comentario? Esta acción no se puede deshacer.',
+                async () => {
+                    try {
+                        const comments = await fetch(`${API_URL}/comments`).then(r => r.json());
+                        const updatedComments = comments.filter(c => c.id !== commentId);
+                        
+                        await fetch(`${API_URL}/comments`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(updatedComments)
+                        });
+                        
+                        // Actualizar UI
+                        const promptId = sessionStorage.getItem('currentPromptId');
+                        const promptComments = updatedComments.filter(c => c.promptId === promptId);
+                        displayComments(promptComments);
+                        document.getElementById('commentCount').textContent = promptComments.length;
+                        
+                        console.log('✅ Comentario eliminado');
+                    } catch (error) {
+                        console.error('❌ Error eliminando comentario:', error);
+                        alert('Error al borrar comentario. Intenta de nuevo.');
+                    }
+                }
+            );
+        }
+        
+        function getTimeAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const seconds = Math.floor((now - date) / 1000);
+            
+            if (seconds < 60) return 'ahora';
+            if (seconds < 3600) return `hace ${Math.floor(seconds / 60)}m`;
+            if (seconds < 86400) return `hace ${Math.floor(seconds / 3600)}h`;
+            if (seconds < 604800) return `hace ${Math.floor(seconds / 86400)}d`;
+            return date.toLocaleDateString();
+        }
+        
+        async function addComment() {
+            if (!checkAuth()) {
+                alert('Debes iniciar sesión para comentar');
+                window.location.href = 'auth.html';
+                return;
+            }
+            
+            const commentInput = document.getElementById('commentInput');
+            const text = commentInput.value.trim();
+            
+            if (!text) {
+                alert('Escribe un comentario primero');
+                return;
+            }
+            
+            const promptId = sessionStorage.getItem('currentPromptId');
+            
+            try {
+                const comments = await fetch(`${API_URL}/comments`).then(r => r.json());
+                
+                const newComment = {
+                    id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+                    promptId: promptId,
+                    userId: currentUser.id || currentUser.email,
+                    username: currentUser.username || currentUser.name,
+                    avatar: currentUser.avatar || null,
+                    text: text,
+                    createdAt: new Date().toISOString()
+                };
+                
+                comments.push(newComment);
+                
+                await fetch(`${API_URL}/comments`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(comments)
+                });
+                
+                // Actualizar UI
+                commentInput.value = '';
+                const promptComments = comments.filter(c => c.promptId === promptId);
+                displayComments(promptComments);
+                document.getElementById('commentCount').textContent = promptComments.length;
+                
+                console.log('✅ Comentario agregado');
+            } catch (error) {
+                console.error('❌ Error agregando comentario:', error);
+                alert('Error al publicar comentario. Intenta de nuevo.');
+            }
         }
 
         function getCategoryLabel(category) {
@@ -331,74 +548,281 @@
             return labels[category] || category;
         }
 
+        async function loadRelatedPrompts(category, currentPromptId) {
+            try {
+                const prompts = await fetch(`${API_URL}/prompts`).then(r => r.json());
+                
+                // Filtrar prompts de la misma categoría, excluyendo el actual
+                const relatedPrompts = prompts
+                    .filter(p => p.category === category && p.id !== currentPromptId)
+                    .slice(0, 4); // Mostrar máximo 4
+                
+                // Actualizar el nombre de la categoría en el título
+                document.getElementById('categoryName').textContent = getCategoryLabel(category);
+                
+                // Renderizar prompts relacionados
+                const grid = document.getElementById('relatedPromptsGrid');
+                grid.innerHTML = relatedPrompts.map(prompt => createPromptCard(prompt)).join('');
+            } catch (error) {
+                console.error('Error cargando prompts relacionados:', error);
+            }
+        }
+
+        function createPromptCard(prompt) {
+            const imageUrl = prompt.images?.[0] || prompt.imageUrl || '';
+            
+            if (prompt.type === 'image') {
+                return `
+                    <article class="group flex flex-col gap-3 cursor-pointer" onclick="viewPrompt('${prompt.id}')">
+                        <div class="relative aspect-[3/4] rounded-2xl overflow-hidden bg-gray-50 ring-1 ring-black/5">
+                            <img alt="${prompt.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="${imageUrl}"/>
+                            <div class="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-2 py-0.5 rounded-full shadow-sm">
+                                <span class="text-[9px] font-bold uppercase tracking-wider text-black">${prompt.model}</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-0.5 px-1">
+                            <h3 class="font-display font-semibold text-[15px] leading-tight text-primary group-hover:text-gray-600 transition-colors">${prompt.title}</h3>
+                            <p class="text-[11px] font-medium text-gray-400">${prompt.author || 'Anónimo'}</p>
+                        </div>
+                    </article>
+                `;
+            } else if (prompt.type === 'text') {
+                return `
+                    <article class="group flex flex-col gap-3 cursor-pointer" onclick="viewPrompt('${prompt.id}')">
+                        <div class="relative aspect-[3/4] rounded-2xl bg-white border border-gray-100 p-5 flex flex-col justify-between hover:shadow-sm hover:border-gray-200 transition-all">
+                            <div class="w-2 h-2 rounded-full bg-black"></div>
+                            <p class="font-body text-[11px] leading-relaxed text-gray-500 line-clamp-6">
+                                <span class="font-semibold text-black">Prompt:</span> ${prompt.prompt.substring(0, 150)}...
+                            </p>
+                            <div class="bg-gray-50 px-2 py-1 rounded-md self-start border border-gray-100">
+                                <span class="text-[9px] font-bold uppercase tracking-wider text-gray-400">${prompt.model}</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-0.5 px-1">
+                            <h3 class="font-display font-semibold text-[15px] leading-tight text-primary group-hover:text-gray-600 transition-colors">${prompt.title}</h3>
+                            <p class="text-[11px] font-medium text-gray-400">${prompt.author || 'Anónimo'}</p>
+                        </div>
+                    </article>
+                `;
+            } else if (prompt.type === 'code') {
+                return `
+                    <article class="group flex flex-col gap-3 cursor-pointer" onclick="viewPrompt('${prompt.id}')">
+                        <div class="relative aspect-[3/4] rounded-2xl bg-gray-900 p-5 flex flex-col overflow-hidden shadow-lg shadow-gray-200">
+                            <div class="flex items-center gap-1.5 opacity-50 mb-4">
+                                <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
+                                <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
+                            </div>
+                            <div class="font-mono text-[10px] text-gray-400 leading-relaxed">
+                                ${prompt.codePreview ? prompt.codePreview.split('\n').slice(0, 4).map(line => `<div>${line}</div>`).join('') : ''}
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-0.5 px-1">
+                            <h3 class="font-display font-semibold text-[15px] leading-tight text-primary group-hover:text-gray-600 transition-colors">${prompt.title}</h3>
+                            <p class="text-[11px] font-medium text-gray-400">${prompt.model}</p>
+                        </div>
+                    </article>
+                `;
+            }
+        }
+
+        function viewPrompt(promptId) {
+            sessionStorage.setItem('currentPromptId', promptId);
+            window.location.reload();
+        }
+
         function goBack() {
             window.location.href = 'index.html';
         }
 
         function copyPrompt() {
             if (!checkAuth()) {
-                alert('Debes iniciar sesión para copiar prompts');
-                window.location.href = 'auth.html';
+                showToast('Debes iniciar sesión para copiar prompts', 'error');
+                setTimeout(() => {
+                    window.location.href = 'auth.html';
+                }, 1500);
                 return;
             }
             
             const promptText = document.getElementById('promptText').textContent;
             navigator.clipboard.writeText(promptText).then(() => {
-                alert('¡Prompt copiado al portapapeles!');
+                showToast('Prompt copiado al portapapeles');
+            }).catch(err => {
+                console.error('Error al copiar:', err);
+                showToast('Error al copiar el prompt', 'error');
             });
         }
 
-        function toggleLike() {
+        // Función para mostrar toast
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            const icon = toast.querySelector('.material-symbols-outlined');
+            const container = toast.querySelector('div');
+            
+            // Configurar ícono y colores según el tipo
+            if (type === 'success') {
+                icon.textContent = 'check_circle';
+                container.className = 'bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 min-w-[280px]';
+            } else if (type === 'error') {
+                icon.textContent = 'error';
+                container.className = 'bg-red-500 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 min-w-[280px]';
+            }
+            
+            toastMessage.textContent = message;
+            
+            // Mostrar con animación
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.style.transform = 'translateX(-50%) translateY(0)';
+                toast.style.opacity = '1';
+            }, 10);
+            
+            // Ocultar después de 3 segundos
+            setTimeout(() => {
+                toast.style.transform = 'translateX(-50%) translateY(-20px)';
+                toast.style.opacity = '0';
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                }, 300);
+            }, 3000);
+        }
+
+        async function toggleLike() {
+            if (!checkAuth()) {
+                alert('Debes iniciar sesión para dar me gusta');
+                window.location.href = 'auth.html';
+                return;
+            }
+            
             const likeBtn = document.getElementById('likeBtn');
             const icon = likeBtn.querySelector('.material-symbols-outlined');
+            const likeCountEl = document.getElementById('likeCount');
             const currentFill = icon.style.fontVariationSettings;
+            const promptId = sessionStorage.getItem('currentPromptId');
             
-            if (currentFill.includes("'FILL' 1")) {
-                icon.style.fontVariationSettings = "'FILL' 0";
-                likeBtn.classList.remove('text-red-500');
-                likeBtn.classList.add('text-gray-500');
-            } else {
-                icon.style.fontVariationSettings = "'FILL' 1";
-                likeBtn.classList.remove('text-gray-500');
-                likeBtn.classList.add('text-red-500');
+            try {
+                // Obtener likes y prompts actuales
+                const [likes, prompts] = await Promise.all([
+                    fetch(`${API_URL}/likes`).then(r => r.json()),
+                    fetch(`${API_URL}/prompts`).then(r => r.json())
+                ]);
+                
+                const prompt = prompts.find(p => p.id === promptId);
+                if (!prompt) return;
+                
+                const userId = currentUser.id || currentUser.email;
+                const existingLike = likes.find(l => l.promptId === promptId && l.userId === userId);
+                
+                let newLikes;
+                if (existingLike) {
+                    // Unlike
+                    icon.style.fontVariationSettings = "'FILL' 0";
+                    likeBtn.classList.remove('text-red-500');
+                    likeBtn.classList.add('text-gray-500');
+                    newLikes = likes.filter(l => l.id !== existingLike.id);
+                    prompt.likes = Math.max(0, (prompt.likes || 0) - 1);
+                } else {
+                    // Like
+                    icon.style.fontVariationSettings = "'FILL' 1";
+                    likeBtn.classList.remove('text-gray-500');
+                    likeBtn.classList.add('text-red-500');
+                    newLikes = [...likes, {
+                        id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+                        promptId: promptId,
+                        userId: userId,
+                        createdAt: new Date().toISOString()
+                    }];
+                    prompt.likes = (prompt.likes || 0) + 1;
+                }
+                
+                // Actualizar contador visual
+                likeCountEl.textContent = prompt.likes;
+                
+                // Guardar en servidor
+                await Promise.all([
+                    fetch(`${API_URL}/likes`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(newLikes)
+                    }),
+                    fetch(`${API_URL}/prompts`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(prompts)
+                    })
+                ]);
+                
+                console.log('✅ Like actualizado');
+            } catch (error) {
+                console.error('❌ Error actualizando like:', error);
+                alert('Error al actualizar. Intenta de nuevo.');
             }
         }
 
         async function toggleBookmark() {
+            if (!checkAuth()) {
+                alert('Debes iniciar sesión para guardar prompts');
+                window.location.href = 'auth.html';
+                return;
+            }
+            
             const bookmarkBtn = document.getElementById('bookmarkBtn');
             const icon = bookmarkBtn.querySelector('.material-symbols-outlined');
             const currentFill = icon.style.fontVariationSettings || "'FILL' 0";
-            
             const promptId = sessionStorage.getItem('currentPromptId');
+            const userId = currentUser.id || currentUser.email;
             
             try {
-                let bookmarks = await fetch(`${API_URL}/bookmarks`).then(r => r.json());
+                // Obtener bookmarks o inicializar array vacío si no existe
+                let bookmarks = [];
+                try {
+                    const response = await fetch(`${API_URL}/bookmarks`);
+                    if (response.ok) {
+                        bookmarks = await response.json();
+                        // Asegurar que sea un array
+                        if (!Array.isArray(bookmarks)) {
+                            bookmarks = [];
+                        }
+                    }
+                } catch (fetchError) {
+                    console.log('Inicializando bookmarks...');
+                    bookmarks = [];
+                }
                 
                 if (currentFill.includes("'FILL' 1")) {
+                    // Remove bookmark
                     icon.style.fontVariationSettings = "'FILL' 0";
-                    bookmarks = bookmarks.filter(b => b.promptId !== promptId);
+                    bookmarks = bookmarks.filter(b => !(b.promptId === promptId && b.userId === userId));
                 } else {
+                    // Add bookmark
                     icon.style.fontVariationSettings = "'FILL' 1";
-                    const existingBookmark = bookmarks.find(b => b.promptId === promptId);
+                    const existingBookmark = bookmarks.find(b => b.promptId === promptId && b.userId === userId);
                     if (!existingBookmark) {
                         bookmarks.push({
                             id: Date.now().toString(36) + Math.random().toString(36).substr(2),
                             promptId: promptId,
-                            userId: 'user-1',
+                            userId: userId,
                             createdAt: new Date().toISOString()
                         });
                     }
                 }
                 
-                await fetch(`${API_URL}/bookmarks`, {
+                const saveResponse = await fetch(`${API_URL}/bookmarks`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(bookmarks)
                 });
                 
+                if (!saveResponse.ok) {
+                    throw new Error('Error al guardar en el servidor');
+                }
+                
                 console.log('✅ Bookmark actualizado');
             } catch (error) {
                 console.error('❌ Error actualizando bookmark:', error);
+                alert('Error al guardar. Intenta de nuevo.');
+                // Revertir el icono
+                icon.style.fontVariationSettings = currentFill;
             }
         }
 

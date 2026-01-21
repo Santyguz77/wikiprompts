@@ -150,19 +150,19 @@
                 </div>
 
                 <!-- Image Upload/URL (optional) -->
-                <div class="flex flex-col gap-2" id="imageUrlField" style="display: none;">
+                <div class="flex flex-col gap-2" id="imageUrlField">
                     <label class="text-sm font-semibold text-gray-900">
-                        Imagen de Ejemplo
-                        <span class="text-gray-400 font-normal">(opcional)</span>
+                        Imágenes
+                        <span class="text-gray-400 font-normal">(opcional - máx. 5)</span>
                     </label>
                     
                     <!-- Tabs para elegir método -->
                     <div class="flex gap-2 mb-2">
                         <button type="button" onclick="toggleImageMethod('upload')" id="uploadTab" class="flex-1 py-2 px-4 rounded-lg bg-black text-white text-sm font-medium transition-colors">
-                            📁 Subir Archivo
+                            Subir Archivos
                         </button>
                         <button type="button" onclick="toggleImageMethod('url')" id="urlTab" class="flex-1 py-2 px-4 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium transition-colors">
-                            🔗 Pegar URL
+                            Pegar URL
                         </button>
                     </div>
                     
@@ -172,11 +172,12 @@
                             type="file" 
                             id="imageFile" 
                             accept="image/*"
+                            multiple
                             onchange="handleImageUpload(event)"
                             class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:border-black focus:ring-0 transition-colors text-sm font-medium file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-black file:text-white hover:file:bg-gray-800"
                         />
-                        <div id="imagePreview" class="hidden mt-2 rounded-xl overflow-hidden border border-gray-200">
-                            <img id="previewImg" src="" alt="Preview" class="w-full h-auto">
+                        <!-- Galería de previsualizaciones -->
+                        <div id="imagePreviewGallery" class="hidden grid grid-cols-3 gap-2 mt-2">
                         </div>
                     </div>
                     
@@ -188,10 +189,16 @@
                             placeholder="https://ejemplo.com/imagen.jpg"
                             class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:border-black focus:ring-0 transition-colors text-sm font-medium placeholder-gray-400"
                         />
+                        <button type="button" onclick="addImageUrl()" class="py-2 px-4 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors">
+                            Agregar Imagen
+                        </button>
+                        <!-- Galería de URLs -->
+                        <div id="urlPreviewGallery" class="hidden grid grid-cols-3 gap-2 mt-2">
+                        </div>
                     </div>
                     
                     <p class="text-xs text-gray-500">
-                        Sube una imagen desde tu dispositivo o pega una URL
+                        Sube hasta 5 imágenes desde tu dispositivo o pega URLs
                     </p>
                 </div>
 
@@ -251,7 +258,7 @@
                         type="submit" 
                         class="w-full py-4 bg-black text-white rounded-full font-semibold text-sm hover:bg-gray-900 transition-colors shadow-lg hover:shadow-xl active:scale-95"
                     >
-                        ✨ Publicar Prompt
+                        Publicar Prompt
                     </button>
                     <button 
                         type="button"
@@ -284,7 +291,8 @@
 
     <script>
         const API_URL = 'https://sentences-col-vice-antivirus.trycloudflare.com/api';
-        let uploadedImageData = null; // Para almacenar la imagen en base64
+        let uploadedImages = []; // Array para almacenar múltiples imágenes
+        const MAX_IMAGES = 5;
 
         const Utils = {
             generateId() {
@@ -342,19 +350,25 @@
             // Mostrar campo correspondiente según tipo
             handleTypeChange();
             
-            // Si hay imagen, mostrarla
-            if (prompt.imageUrl) {
-                if (prompt.imageUrl.startsWith('data:')) {
-                    // Es una imagen en base64
-                    uploadedImageData = prompt.imageUrl;
-                    const preview = document.getElementById('imagePreview');
-                    const previewImg = document.getElementById('previewImg');
-                    previewImg.src = uploadedImageData;
-                    preview.classList.remove('hidden');
+            // Si hay imágenes, cargarlas
+            if (prompt.images && Array.isArray(prompt.images)) {
+                uploadedImages = [...prompt.images];
+                if (prompt.images[0] && prompt.images[0].startsWith('data:')) {
+                    toggleImageMethod('upload');
+                    updateImageGallery();
                 } else {
-                    // Es una URL
-                    document.getElementById('imageUrl').value = prompt.imageUrl;
                     toggleImageMethod('url');
+                    updateImageGalleryUrls();
+                }
+            } else if (prompt.imageUrl) {
+                // Compatibilidad con formato antiguo de una sola imagen
+                uploadedImages = [prompt.imageUrl];
+                if (prompt.imageUrl.startsWith('data:')) {
+                    toggleImageMethod('upload');
+                    updateImageGallery();
+                } else {
+                    toggleImageMethod('url');
+                    updateImageGalleryUrls();
                 }
             }
             
@@ -364,7 +378,7 @@
             
             // Cambiar texto del botón
             const submitBtn = document.querySelector('button[type="submit"]');
-            submitBtn.innerHTML = '💾 Guardar Cambios';
+            submitBtn.innerHTML = 'Guardar Cambios';
         }
 
         // Alternar entre subir archivo y pegar URL
@@ -441,51 +455,167 @@
             });
         }
 
-        // Manejar subida de imagen con compresión
+        // Manejar subida de múltiples imágenes con compresión
         async function handleImageUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+            const files = Array.from(event.target.files);
+            if (files.length === 0) return;
             
-            // Validar tipo de archivo
-            if (!file.type.startsWith('image/')) {
-                alert('Por favor selecciona un archivo de imagen válido');
+            // Validar límite de imágenes
+            if (uploadedImages.length + files.length > MAX_IMAGES) {
+                alert(`Solo puedes subir hasta ${MAX_IMAGES} imágenes. Actualmente tienes ${uploadedImages.length}.`);
+                event.target.value = '';
                 return;
             }
             
-            try {
-                // Mostrar indicador de carga
-                const preview = document.getElementById('imagePreview');
-                const previewImg = document.getElementById('previewImg');
-                preview.classList.remove('hidden');
-                previewImg.src = '';
-                previewImg.style.opacity = '0.5';
+            const gallery = document.getElementById('imagePreviewGallery');
+            gallery.classList.remove('hidden');
+            
+            for (const file of files) {
+                // Validar tipo de archivo
+                if (!file.type.startsWith('image/')) {
+                    console.warn('Archivo omitido (no es imagen):', file.name);
+                    continue;
+                }
                 
-                // Crear elemento de loading
-                const loadingDiv = document.createElement('div');
-                loadingDiv.id = 'imageLoading';
-                loadingDiv.className = 'absolute inset-0 flex items-center justify-center bg-white/80';
-                loadingDiv.innerHTML = '<div class="flex flex-col items-center gap-2"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div><p class="text-sm text-gray-600">Comprimiendo imagen...</p></div>';
-                preview.style.position = 'relative';
-                preview.appendChild(loadingDiv);
-                
-                // Comprimir imagen
-                uploadedImageData = await compressImage(file);
-                
-                // Remover loading y mostrar preview
-                const loading = document.getElementById('imageLoading');
-                if (loading) loading.remove();
-                previewImg.src = uploadedImageData;
-                previewImg.style.opacity = '1';
-                
-                // Mostrar mensaje de éxito
-                const sizeInMB = (file.size / 1024 / 1024).toFixed(2);
-                console.log(`✅ Imagen subida y optimizada (Original: ${sizeInMB}MB)`);
-                
-            } catch (error) {
-                console.error('Error al procesar imagen:', error);
-                alert('Error al procesar la imagen. Intenta con otra imagen.');
-                preview.classList.add('hidden');
+                try {
+                    // Crear contenedor de preview con loading
+                    const previewContainer = document.createElement('div');
+                    previewContainer.className = 'relative rounded-lg overflow-hidden border border-gray-200 aspect-square';
+                    const previewId = 'preview_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    previewContainer.id = previewContainer;
+                    
+                    previewContainer.innerHTML = `
+                        <div class="absolute inset-0 flex items-center justify-center bg-white">
+                            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-black"></div>
+                        </div>
+                    `;
+                    gallery.appendChild(previewContainer);
+                    
+                    // Comprimir imagen
+                    const compressedImage = await compressImage(file);
+                    
+                    // Agregar al array
+                    const imageIndex = uploadedImages.length;
+                    uploadedImages.push(compressedImage);
+                    
+                    // Actualizar preview con imagen y botón de eliminar
+                    previewContainer.innerHTML = `
+                        <img src="${compressedImage}" alt="Preview" class="w-full h-full object-cover">
+                        <button type="button" onclick="removeImage(${imageIndex})" 
+                                class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center hover:bg-red-600 transition-colors shadow text-xs">
+                            ×
+                        </button>
+                    `;
+                    
+                    console.log(`Imagen ${imageIndex + 1} optimizada (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
+                    
+                } catch (error) {
+                    console.error('Error al procesar imagen:', error);
+                    alert('Error al procesar una de las imágenes.');
+                }
             }
+            
+            // Limpiar input para permitir reselección
+            event.target.value = '';
+        }
+        
+        // Eliminar imagen del array
+        function removeImage(index) {
+            uploadedImages.splice(index, 1);
+            updateImageGallery();
+        }
+        
+        // Actualizar galería de imágenes
+        function updateImageGallery() {
+            const gallery = document.getElementById('imagePreviewGallery');
+            gallery.innerHTML = '';
+            
+            if (uploadedImages.length === 0) {
+                gallery.classList.add('hidden');
+                return;
+            }
+            
+            gallery.classList.remove('hidden');
+            uploadedImages.forEach((imgData, index) => {
+                const previewContainer = document.createElement('div');
+                previewContainer.className = 'relative rounded-lg overflow-hidden border border-gray-200 aspect-square';
+                previewContainer.innerHTML = `
+                    <img src="${imgData}" alt="Preview ${index + 1}" class="w-full h-full object-cover">
+                    <button type="button" onclick="removeImage(${index})" 
+                            class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center hover:bg-red-600 transition-colors shadow text-xs">
+                        ×
+                    </button>
+                    <div class="absolute bottom-1 left-1 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded">
+                        ${index + 1}
+                    </div>
+                `;
+                gallery.appendChild(previewContainer);
+            });
+        }
+        
+        // Agregar imagen por URL
+        function addImageUrl() {
+            const urlInput = document.getElementById('imageUrl');
+            const url = urlInput.value.trim();
+            
+            if (!url) {
+                alert('Por favor ingresa una URL de imagen');
+                return;
+            }
+            
+            if (uploadedImages.length >= MAX_IMAGES) {
+                alert(`Solo puedes agregar hasta ${MAX_IMAGES} imágenes`);
+                return;
+            }
+            
+            // Validar formato básico de URL
+            try {
+                new URL(url);
+            } catch (e) {
+                alert('URL inválida');
+                return;
+            }
+            
+            // Agregar URL al array
+            uploadedImages.push(url);
+            urlInput.value = '';
+            
+            // Actualizar galería
+            updateImageGalleryUrls();
+        }
+        
+        // Actualizar galería de URLs
+        function updateImageGalleryUrls() {
+            const gallery = document.getElementById('urlPreviewGallery');
+            gallery.innerHTML = '';
+            
+            if (uploadedImages.length === 0) {
+                gallery.classList.add('hidden');
+                return;
+            }
+            
+            gallery.classList.remove('hidden');
+            uploadedImages.forEach((url, index) => {
+                const previewContainer = document.createElement('div');
+                previewContainer.className = 'relative rounded-lg overflow-hidden border border-gray-200 aspect-square';
+                previewContainer.innerHTML = `
+                    <img src="${url}" alt="Preview ${index + 1}" class="w-full h-full object-cover" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27100%27 height=%27100%27%3E%3Crect fill=%27%23f0f0f0%27 width=%27100%27 height=%27100%27/%3E%3Ctext x=%2750%25%27 y=%2750%25%27 text-anchor=%27middle%27 dy=%27.3em%27 fill=%27%23999%27%3EX%3C/text%3E%3C/svg%3E'">
+                    <button type="button" onclick="removeImageUrl(${index})" 
+                            class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center hover:bg-red-600 transition-colors shadow text-xs">
+                        ×
+                    </button>
+                    <div class="absolute bottom-1 left-1 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded">
+                        ${index + 1}
+                    </div>
+                `;
+                gallery.appendChild(previewContainer);
+            });
+        }
+        
+        // Eliminar URL del array
+        function removeImageUrl(index) {
+            uploadedImages.splice(index, 1);
+            updateImageGalleryUrls();
         }
 
         function handleTypeChange() {
@@ -532,16 +662,10 @@
             };
 
             // Add optional fields
-            if (promptData.type === 'image') {
-                // Usar imagen subida si existe, sino usar URL
-                if (uploadedImageData) {
-                    promptData.imageUrl = uploadedImageData;
-                } else {
-                    const imageUrl = document.getElementById('imageUrl').value;
-                    if (imageUrl) {
-                        promptData.imageUrl = imageUrl;
-                    }
-                }
+            if (uploadedImages.length > 0) {
+                promptData.images = uploadedImages;
+                // Mantener compatibilidad con código antiguo usando la primera imagen
+                promptData.imageUrl = uploadedImages[0];
             }
 
             if (promptData.type === 'code') {
