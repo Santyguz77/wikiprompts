@@ -48,6 +48,14 @@
 </head>
 
 <body class="bg-surface text-primary font-body overflow-x-hidden">
+    <!-- Toast de notificación -->
+    <div id="toast" class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-[10000] transform transition-all duration-300">
+        <div id="toastContent" class="bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 min-w-[280px]">
+            <span id="toastIcon" class="material-symbols-outlined text-[20px]">check_circle</span>
+            <span id="toastMessage" class="text-sm font-medium">Acción completada</span>
+        </div>
+    </div>
+
     <div class="relative flex flex-col w-full max-w-md lg:max-w-5xl mx-auto min-h-screen bg-white shadow-2xl overflow-hidden border-x border-gray-50">
         
         <!-- Header -->
@@ -300,6 +308,33 @@
             }
         };
 
+        // Sistema de toast para notificaciones
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastContent = document.getElementById('toastContent');
+            const toastIcon = document.getElementById('toastIcon');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            // Configurar contenido
+            toastMessage.textContent = message;
+            
+            if (isError) {
+                toastContent.className = 'bg-red-500 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 min-w-[280px]';
+                toastIcon.textContent = 'error';
+            } else {
+                toastContent.className = 'bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 min-w-[280px]';
+                toastIcon.textContent = 'check_circle';
+            }
+            
+            // Mostrar toast
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('opacity-0'), 3000);
+            setTimeout(() => {
+                toast.classList.add('hidden');
+                toast.classList.remove('opacity-0');
+            }, 3300);
+        }
+
         // Cargar usuario automáticamente al iniciar
         window.addEventListener('DOMContentLoaded', () => {
             const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
@@ -311,8 +346,8 @@
                 authorInput.value = currentUser.name;
             } else {
                 // Si no hay usuario, redirigir al login
-                alert('Debes iniciar sesión para contribuir');
-                window.location.href = 'auth.html';
+                showToast('Debes iniciar sesión para contribuir', true);
+                setTimeout(() => window.location.href = 'auth.html', 1500);
                 return;
             }
             
@@ -329,12 +364,14 @@
         function loadPromptForEditing() {
             const promptData = sessionStorage.getItem('editingPrompt');
             if (!promptData) {
-                alert('No se encontró el prompt a editar');
-                window.location.href = 'index.html';
+                showToast('No se encontró el prompt a editar', true);
+                setTimeout(() => window.location.href = 'index.html', 1500);
                 return;
             }
             
             const prompt = JSON.parse(promptData);
+            console.log('Cargando prompt para editar:', prompt);
+            console.log('ID del prompt:', prompt.id);
             
             // Cambiar título del header
             document.getElementById('pageTitle').textContent = 'Editar Prompt';
@@ -462,7 +499,7 @@
             
             // Validar límite de imágenes
             if (uploadedImages.length + files.length > MAX_IMAGES) {
-                alert(`Solo puedes subir hasta ${MAX_IMAGES} imágenes. Actualmente tienes ${uploadedImages.length}.`);
+                showToast(`Solo puedes subir hasta ${MAX_IMAGES} imágenes`, true);
                 event.target.value = '';
                 return;
             }
@@ -511,7 +548,7 @@
                     
                 } catch (error) {
                     console.error('Error al procesar imagen:', error);
-                    alert('Error al procesar una de las imágenes.');
+                    showToast('Error al procesar una de las imágenes', true);
                 }
             }
             
@@ -559,12 +596,12 @@
             const url = urlInput.value.trim();
             
             if (!url) {
-                alert('Por favor ingresa una URL de imagen');
+                showToast('Por favor ingresa una URL de imagen', true);
                 return;
             }
             
             if (uploadedImages.length >= MAX_IMAGES) {
-                alert(`Solo puedes agregar hasta ${MAX_IMAGES} imágenes`);
+                showToast(`Solo puedes agregar hasta ${MAX_IMAGES} imágenes`, true);
                 return;
             }
             
@@ -572,7 +609,7 @@
             try {
                 new URL(url);
             } catch (e) {
-                alert('URL inválida');
+                showToast('URL inválida', true);
                 return;
             }
             
@@ -657,9 +694,12 @@
                 prompt: document.getElementById('prompt').value,
                 description: document.getElementById('description').value,
                 author: document.getElementById('author').value,
-                likes: isEditing ? editingPrompt.likes : 0,
-                createdAt: isEditing ? editingPrompt.createdAt : new Date().toISOString()
+                likes: isEditing ? (editingPrompt.likes || 0) : 0,
+                createdAt: isEditing ? editingPrompt.createdAt : new Date().toISOString(),
+                updatedAt: isEditing ? new Date().toISOString() : undefined
             };
+            
+            console.log('Datos del prompt a guardar:', promptData);
 
             // Add optional fields
             if (uploadedImages.length > 0) {
@@ -684,12 +724,21 @@
                 
                 if (isEditing) {
                     // Actualizar el prompt existente
+                    console.log('Buscando prompt con ID:', promptData.id);
                     const index = prompts.findIndex(p => p.id === promptData.id);
+                    console.log('Índice encontrado:', index);
+                    
                     if (index !== -1) {
+                        console.log('Actualizando prompt en índice:', index);
                         prompts[index] = promptData;
+                    } else {
+                        console.warn('No se encontró el prompt con ID:', promptData.id);
+                        // Si no se encuentra, agregarlo como nuevo
+                        prompts.unshift(promptData);
                     }
                 } else {
                     // Agregar el nuevo prompt al inicio
+                    console.log('Agregando nuevo prompt');
                     prompts.unshift(promptData);
                 }
                 
@@ -703,14 +752,14 @@
                 if (saveResponse.ok) {
                     console.log(isEditing ? '✅ Prompt actualizado exitosamente' : '✅ Prompt guardado exitosamente');
                     sessionStorage.removeItem('editingPrompt');
-                    alert(isEditing ? '💾 ¡Prompt actualizado exitosamente!' : '✨ ¡Prompt publicado exitosamente!');
-                    window.location.href = 'index.html';
+                    showToast(isEditing ? 'Prompt actualizado exitosamente' : 'Prompt publicado exitosamente');
+                    setTimeout(() => window.location.href = 'index.html', 1500);
                 } else {
                     throw new Error('Error al guardar');
                 }
             } catch (error) {
                 console.error('❌ Error:', error);
-                alert('❌ No se pudo conectar con el servidor. Verifica que esté en ejecución.');
+                showToast('No se pudo conectar con el servidor', true);
             }
         });
     </script>

@@ -32,6 +32,15 @@ function requireAuth() {
     return true;
 }
 
+// Función para verificar si el usuario es administrador
+function isAdmin() {
+    if (!AppState.currentUser) return false;
+    
+    // Verificar si es el administrador
+    return AppState.currentUser.email === 'santyguz777@gmail.com' || 
+           AppState.currentUser.username === 'santyguz77';
+}
+
 // Función para cerrar sesión
 async function logout() {
     try {
@@ -238,33 +247,6 @@ async function init() {
     
     // Actualizar UI con usuario actual
     updateUserUI();
-    
-    // Verificar si hay filtros desde la página de explorar
-    const filterCategory = localStorage.getItem('filterCategory');
-    const filterAuthor = localStorage.getItem('filterAuthor');
-    
-    if (filterCategory) {
-        AppState.currentCategory = filterCategory;
-        // Actualizar UI del botón de categoría activo
-        document.querySelectorAll('.category-btn').forEach(btn => {
-            btn.classList.remove('active', 'bg-black', 'text-white');
-            btn.classList.add('bg-white', 'text-gray-500');
-            if (btn.dataset.category === filterCategory) {
-                btn.classList.remove('bg-white', 'text-gray-500');
-                btn.classList.add('active', 'bg-black', 'text-white');
-            }
-        });
-        localStorage.removeItem('filterCategory');
-    }
-    
-    if (filterAuthor) {
-        AppState.searchQuery = filterAuthor;
-        const searchInput = document.getElementById('searchInput');
-        if (searchInput) {
-            searchInput.value = filterAuthor;
-        }
-        localStorage.removeItem('filterAuthor');
-    }
     
     // Renderizar prompts
     renderPrompts();

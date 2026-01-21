@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="theme-color" content="#000000"/>
+    <title>Administración - Wikiprompts</title>
+    
+    <link rel="manifest" href="/manifest.json"/>
+    <link rel="icon" type="image/png" href="/image.png"/>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0a0a0a", 
+                        "secondary": "#666666",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "body": ["Manrope", "sans-serif"],
+                    },
+                    boxShadow: {
+                        'subtle': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+
+<body class="bg-white text-gray-900 font-body">
+    <!-- Modal de confirmación -->
+    <div id="confirmModal" class="hidden fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden">
+            <div class="p-6">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="flex items-center justify-center w-12 h-12 rounded-full bg-red-100">
+                        <span class="material-symbols-outlined text-red-600 text-2xl">warning</span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900" id="confirmTitle">Eliminar prompt</h3>
+                    </div>
+                </div>
+                <p class="text-gray-600 text-sm leading-relaxed mb-6" id="confirmMessage">
+                    ¿Estás seguro de que quieres eliminar este prompt? Esta acción no se puede deshacer.
+                </p>
+                <div class="flex gap-3">
+                    <button onclick="cancelConfirm()" class="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+                        Cancelar
+                    </button>
+                    <button onclick="acceptConfirm()" class="flex-1 px-4 py-2.5 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-colors">
+                        Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="relative mx-auto flex h-full min-h-screen w-full max-w-md lg:max-w-none flex-col shadow-xl bg-white pb-8">
+        
+        <!-- Header -->
+        <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 p-4 lg:px-12">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <button onclick="window.location.href='index.html'" class="flex size-10 items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                    </button>
+                    <h1 class="text-2xl lg:text-3xl font-display font-bold tracking-tight">Panel de Administración</h1>
+                </div>
+                <div class="flex items-center gap-2 px-4 py-2 bg-red-100 rounded-full">
+                    <span class="material-symbols-outlined text-red-600 text-[18px]">shield</span>
+                    <span class="text-sm font-semibold text-red-600">Admin</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats -->
+        <section class="px-6 lg:px-12 xl:px-24 py-6 lg:py-8">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="material-symbols-outlined text-gray-600 text-[20px]">description</span>
+                        <span class="text-xs font-semibold text-gray-600 uppercase">Total Prompts</span>
+                    </div>
+                    <p id="totalPrompts" class="text-2xl font-bold text-gray-900">0</p>
+                </div>
+                <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="material-symbols-outlined text-gray-600 text-[20px]">person</span>
+                        <span class="text-xs font-semibold text-gray-600 uppercase">Usuarios</span>
+                    </div>
+                    <p id="totalUsers" class="text-2xl font-bold text-gray-900">0</p>
+                </div>
+                <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="material-symbols-outlined text-gray-600 text-[20px]">chat</span>
+                        <span class="text-xs font-semibold text-gray-600 uppercase">Comentarios</span>
+                    </div>
+                    <p id="totalComments" class="text-2xl font-bold text-gray-900">0</p>
+                </div>
+                <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="material-symbols-outlined text-gray-600 text-[20px]">favorite</span>
+                        <span class="text-xs font-semibold text-gray-600 uppercase">Total Likes</span>
+                    </div>
+                    <p id="totalLikes" class="text-2xl font-bold text-gray-900">0</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Prompts List -->
+        <section class="px-6 lg:px-12 xl:px-24 py-6 lg:py-8">
+            <div class="flex items-center justify-between mb-5">
+                <h2 class="text-xl font-display font-bold text-gray-900">Gestionar Prompts</h2>
+                <div class="flex gap-2">
+                    <select id="filterCategory" onchange="filterPrompts()" class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium focus:border-black focus:ring-0">
+                        <option value="all">Todas las categorías</option>
+                        <option value="visuals">Visuales</option>
+                        <option value="coding">Código</option>
+                        <option value="writing">Escritura</option>
+                        <option value="marketing">Marketing</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div id="promptsList" class="flex flex-col gap-3">
+                <!-- Se cargarán dinámicamente -->
+            </div>
+        </section>
+                <!-- Se cargarán dinámicamente -->
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const API_URL = 'https://sentences-col-vice-antivirus.trycloudflare.com/api';
+        let allPrompts = [];
+        let currentUser = null;
+        let confirmCallback = null;
+
+        // Verificar que el usuario sea administrador
+        async function checkAdmin() {
+            const storedUser = localStorage.getItem('currentUser');
+            if (!storedUser) {
+                alert('Debes iniciar sesión');
+                window.location.href = 'auth.html';
+                return false;
+            }
+            
+            currentUser = JSON.parse(storedUser);
+            
+            // Verificar si es el administrador
+            const isAdmin = currentUser.email === 'santyguz777@gmail.com' || 
+                           currentUser.username === 'santyguz77';
+            
+            if (!isAdmin) {
+                alert('No tienes permisos de administrador');
+                window.location.href = 'index.html';
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Cargar datos
+        async function loadData() {
+            try {
+                const [prompts, users, comments, likes] = await Promise.all([
+                    fetch(`${API_URL}/prompts`).then(r => r.json()),
+                    fetch(`${API_URL}/auth_users`).then(r => r.json()).catch(() => []),
+                    fetch(`${API_URL}/comments`).then(r => r.json()),
+                    fetch(`${API_URL}/likes`).then(r => r.json())
+                ]);
+                
+                allPrompts = prompts;
+                
+                // Actualizar estadísticas
+                document.getElementById('totalPrompts').textContent = prompts.length;
+                document.getElementById('totalUsers').textContent = users.length;
+                document.getElementById('totalComments').textContent = comments.length;
+                document.getElementById('totalLikes').textContent = likes.reduce((sum, l) => sum + (l.count || 1), 0);
+                
+                renderPrompts(prompts);
+            } catch (error) {
+                console.error('Error cargando datos:', error);
+                alert('Error al cargar datos');
+            }
+        }
+
+        // Renderizar prompts
+        function renderPrompts(prompts) {
+            const container = document.getElementById('promptsList');
+            
+            if (prompts.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-500 py-8">No hay prompts para mostrar</p>';
+                return;
+            }
+            
+            container.innerHTML = prompts.map(prompt => {
+                const imageUrl = prompt.images?.[0] || prompt.imageUrl || '';
+                const categoryLabels = {
+                    'visuals': 'Visuales',
+                    'coding': 'Código',
+                    'writing': 'Escritura',
+                    'marketing': 'Marketing'
+                };
+                
+                return `
+                    <div class="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-sm transition-all">
+                        <div class="flex gap-4">
+                            ${imageUrl ? `
+                                <div class="flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden bg-gray-100">
+                                    <img src="${imageUrl}" alt="${prompt.title}" class="w-full h-full object-cover">
+                                </div>
+                            ` : ''}
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-start justify-between gap-4 mb-2">
+                                    <div class="flex-1 min-w-0">
+                                        <h3 class="font-display font-bold text-lg text-gray-900 truncate">${prompt.title}</h3>
+                                        <p class="text-sm text-gray-500">por ${prompt.author}</p>
+                                    </div>
+                                    <button 
+                                        onclick="deletePrompt('${prompt.id}')" 
+                                        class="flex-shrink-0 flex items-center gap-2 px-3 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-colors"
+                                    >
+                                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                                        <span class="hidden lg:inline">Eliminar</span>
+                                    </button>
+                                </div>
+                                <div class="flex flex-wrap items-center gap-3 text-xs text-gray-500">
+                                    <span class="px-2 py-1 bg-gray-100 rounded-full">${categoryLabels[prompt.category] || prompt.category}</span>
+                                    <span class="px-2 py-1 bg-gray-100 rounded-full">${prompt.model}</span>
+                                    <span class="flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-[14px]">favorite</span>
+                                        ${prompt.likes || 0}
+                                    </span>
+                                    <span class="text-gray-400">${new Date(prompt.createdAt).toLocaleDateString()}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Filtrar prompts
+        function filterPrompts() {
+            const category = document.getElementById('filterCategory').value;
+            const filtered = category === 'all' 
+                ? allPrompts 
+                : allPrompts.filter(p => p.category === category);
+            renderPrompts(filtered);
+        }
+
+        // Filtrar prompts
+        function deletePrompt(promptId) {
+            const prompt = allPrompts.find(p => p.id === promptId);
+            if (!prompt) return;
+            
+            showConfirm(
+                'Eliminar prompt',
+                `¿Estás seguro de que quieres eliminar "${prompt.title}"? Esta acción no se puede deshacer.`,
+                async () => {
+                    try {
+                        // Eliminar prompt
+                        const updatedPrompts = allPrompts.filter(p => p.id !== promptId);
+                        
+                        await fetch(`${API_URL}/prompts`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(updatedPrompts)
+                        });
+                        
+                        // Eliminar comentarios asociados
+                        const comments = await fetch(`${API_URL}/comments`).then(r => r.json());
+                        const updatedComments = comments.filter(c => c.promptId !== promptId);
+                        await fetch(`${API_URL}/comments`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(updatedComments)
+                        });
+                        
+                        // Eliminar likes asociados
+                        const likes = await fetch(`${API_URL}/likes`).then(r => r.json());
+                        const updatedLikes = likes.filter(l => l.promptId !== promptId);
+                        await fetch(`${API_URL}/likes`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(updatedLikes)
+                        });
+                        
+                        alert('Prompt eliminado exitosamente');
+                        await loadData(); // Recargar datos
+                    } catch (error) {
+                        console.error('Error eliminando prompt:', error);
+                        alert('Error al eliminar el prompt');
+                    }
+                }
+            );
+        }
+
+        // Modal de confirmación
+        function showConfirm(title, message, callback) {
+            document.getElementById('confirmTitle').textContent = title;
+            document.getElementById('confirmMessage').textContent = message;
+            document.getElementById('confirmModal').classList.remove('hidden');
+            confirmCallback = callback;
+        }
+
+        function cancelConfirm() {
+            document.getElementById('confirmModal').classList.add('hidden');
+            confirmCallback = null;
+        }
+
+        function acceptConfirm() {
+            document.getElementById('confirmModal').classList.add('hidden');
+            if (confirmCallback) {
+                confirmCallback();
+                confirmCallback = null;
+            }
+        }
+
+        // Inicializar
+        window.addEventListener('DOMContentLoaded', async () => {
+            const isAdmin = await checkAdmin();
+            if (isAdmin) {
+                await loadData();
+            }
+        });
+    </script>
+</body>
+</html>

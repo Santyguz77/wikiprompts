@@ -102,16 +102,23 @@
         <!-- Main Content -->
         <main class="flex-1 flex flex-col pb-24">
             <div class="px-6 lg:px-12 xl:px-24 py-6 lg:py-8 max-w-5xl lg:mx-auto w-full">
-                <!-- Image Preview (if applicable) -->
-                <div id="imagePreview" class="w-full max-w-2xl mx-auto aspect-video relative bg-gray-50 rounded-2xl overflow-hidden shadow-lg mb-8 hidden">
-                    <div id="imageContainer" class="absolute inset-0 bg-cover bg-center"></div>
-                    <div class="absolute bottom-4 right-4 flex gap-2">
-                        <button onclick="fullscreenImage()" class="size-10 flex items-center justify-center rounded-full bg-white/90 shadow-sm text-gray-700 hover:text-black transition-colors backdrop-blur-sm">
-                            <span class="material-symbols-outlined text-[20px]">fullscreen</span>
-                        </button>
-                        <button onclick="downloadImage()" class="size-10 flex items-center justify-center rounded-full bg-white/90 shadow-sm text-gray-700 hover:text-black transition-colors backdrop-blur-sm">
-                            <span class="material-symbols-outlined text-[20px]">download</span>
-                        </button>
+                <!-- Image Gallery (if applicable) -->
+                <div id="imageGallery" class="w-full max-w-4xl mx-auto mb-8 hidden">
+                    <!-- Imagen principal -->
+                    <div class="relative aspect-video bg-gray-50 rounded-2xl overflow-hidden shadow-lg mb-4">
+                        <img id="mainImage" src="" alt="" class="w-full h-full object-cover">
+                        <div class="absolute bottom-4 right-4 flex gap-2">
+                            <button onclick="fullscreenImage()" class="size-10 flex items-center justify-center rounded-full bg-white/90 shadow-sm text-gray-700 hover:text-black transition-colors backdrop-blur-sm">
+                                <span class="material-symbols-outlined text-[20px]">fullscreen</span>
+                            </button>
+                            <button onclick="downloadImage()" class="size-10 flex items-center justify-center rounded-full bg-white/90 shadow-sm text-gray-700 hover:text-black transition-colors backdrop-blur-sm">
+                                <span class="material-symbols-outlined text-[20px]">download</span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Miniaturas -->
+                    <div id="thumbnailsContainer" class="grid grid-cols-5 gap-2">
+                        <!-- Se llenarán dinámicamente -->
                     </div>
                 </div>
 
@@ -307,12 +314,10 @@
                 }
             }
             
-            // Display image if exists
-            if (prompt.imageUrl) {
-                const imagePreview = document.getElementById('imagePreview');
-                const imageContainer = document.getElementById('imageContainer');
-                imagePreview.classList.remove('hidden');
-                imageContainer.style.backgroundImage = `url('${prompt.imageUrl}')`;
+            // Display images gallery if exists
+            const images = prompt.images || (prompt.imageUrl ? [prompt.imageUrl] : []);
+            if (images.length > 0) {
+                displayImageGallery(images);
             }
 
             // Display prompt text
@@ -849,15 +854,104 @@
             window.location.href = 'contribute.html?edit=true';
         }
 
-        function fullscreenImage() {
-            const imageContainer = document.getElementById('imageContainer');
-            if (imageContainer.requestFullscreen) {
-                imageContainer.requestFullscreen();
+        // Mostrar galería de imágenes
+        function displayImageGallery(images) {
+            const gallery = document.getElementById('imageGallery');
+            const mainImage = document.getElementById('mainImage');
+            const thumbnailsContainer = document.getElementById('thumbnailsContainer');
+            
+            gallery.classList.remove('hidden');
+            
+            // Establecer primera imagen como principal
+            mainImage.src = images[0];
+            mainImage.alt = window.currentPrompt?.title || 'Imagen';
+            
+            // Si hay más de una imagen, mostrar miniaturas
+            if (images.length > 1) {
+                thumbnailsContainer.innerHTML = images.map((img, index) => `
+                    <button 
+                        onclick="changeMainImage('${img.replace(/'/g, "\\'")}', ${index})"
+                        class="aspect-square rounded-lg overflow-hidden border-2 ${index === 0 ? 'border-black' : 'border-gray-200 hover:border-gray-400'} transition-all"
+                        id="thumbnail-${index}"
+                    >
+                        <img src="${img}" alt="Imagen ${index + 1}" class="w-full h-full object-cover">
+                    </button>
+                `).join('');
+            } else {
+                thumbnailsContainer.classList.add('hidden');
             }
         }
 
-        function downloadImage() {
-            alert('Función de descarga próximamente');
+        // Cambiar imagen principal
+        window.changeMainImage = function(imageUrl, index) {
+            const mainImage = document.getElementById('mainImage');
+            mainImage.src = imageUrl;
+            
+            // Actualizar bordes de miniaturas
+            const allThumbnails = document.querySelectorAll('[id^="thumbnail-"]');
+            allThumbnails.forEach((thumb, i) => {
+                if (i === index) {
+                    thumb.classList.remove('border-gray-200', 'hover:border-gray-400');
+                    thumb.classList.add('border-black');
+                } else {
+                    thumb.classList.remove('border-black');
+                    thumb.classList.add('border-gray-200', 'hover:border-gray-400');
+                }
+            });
+        }
+
+        function fullscreenImage() {
+            const mainImage = document.getElementById('mainImage');
+            if (mainImage && mainImage.requestFullscreen) {
+                mainImage.requestFullscreen();
+            }
+        }
+
+        async function downloadImage() {
+            if (!window.currentPrompt) {
+                showToast('No hay imagen para descargar', true);
+                return;
+            }
+            
+            // Obtener la imagen actualmente mostrada
+            const mainImage = document.getElementById('mainImage');
+            const imageUrl = mainImage ? mainImage.src : (window.currentPrompt.images?.[0] || window.currentPrompt.imageUrl);
+            
+            if (!imageUrl) {
+                showToast('No hay imagen para descargar', true);
+                return;
+            }
+            
+            try {
+                // Si la imagen es base64, descargar directamente
+                if (imageUrl.startsWith('data:')) {
+                    const link = document.createElement('a');
+                    link.href = imageUrl;
+                    link.download = `${window.currentPrompt.title || 'prompt'}.jpg`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    showToast('Imagen descargada correctamente');
+                } else {
+                    // Si es URL externa, intentar descargar
+                    const response = await fetch(imageUrl);
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `${window.currentPrompt.title || 'prompt'}.jpg`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(url);
+                    showToast('Imagen descargada correctamente');
+                }
+            } catch (error) {
+                console.error('Error descargando imagen:', error);
+                // Si falla el fetch, abrir en nueva pestaña
+                window.open(imageUrl, '_blank');
+                showToast('Imagen abierta en nueva pestaña');
+            }
         }
 
         // Initialize on load

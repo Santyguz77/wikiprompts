@@ -66,12 +66,18 @@
                 </p>
             </div>
             
-            <div class="flex gap-3 mt-6">
-                <button onclick="editProfile()" class="flex h-10 px-6 items-center justify-center rounded-md bg-primary text-white text-sm font-bold shadow-sm hover:bg-[#233642] transition-transform active:scale-95">
-                    Editar Perfil
-                </button>
-                <button onclick="logout()" class="flex h-10 px-6 items-center justify-center rounded-md border border-gray-300 text-gray-700 text-sm font-bold hover:bg-gray-50 transition-transform active:scale-95">
-                    Cerrar Sesión
+            <div class="flex flex-col gap-3 mt-6">
+                <div class="flex gap-3">
+                    <button onclick="editProfile()" class="flex h-10 px-6 items-center justify-center rounded-md bg-primary text-white text-sm font-bold shadow-sm hover:bg-[#233642] transition-transform active:scale-95">
+                        Editar Perfil
+                    </button>
+                    <button onclick="logout()" class="flex h-10 px-6 items-center justify-center rounded-md border border-gray-300 text-gray-700 text-sm font-bold hover:bg-gray-50 transition-transform active:scale-95">
+                        Cerrar Sesión
+                    </button>
+                </div>
+                <button id="adminBtn" class="hidden items-center justify-center gap-2 h-10 px-6 rounded-md bg-red-600 text-white text-sm font-bold shadow-sm hover:bg-red-700 transition-transform active:scale-95">
+                    <span class="material-symbols-outlined text-[18px]">shield</span>
+                    Panel de Administración
                 </button>
             </div>
         </div>
@@ -234,6 +240,24 @@
             currentUser = JSON.parse(storedUser);
             loadUserProfile();
             await renderPrompts();
+            
+            // Mostrar botón de admin si el usuario es administrador
+            checkAndShowAdminButton();
+        }
+        
+        function checkAndShowAdminButton() {
+            const adminBtn = document.getElementById('adminBtn');
+            if (!adminBtn || !currentUser) return;
+            
+            // Verificar si es el administrador
+            const isAdmin = currentUser.email === 'santyguz777@gmail.com' || 
+                           currentUser.username === 'santyguz77';
+            
+            if (isAdmin) {
+                adminBtn.classList.remove('hidden');
+                adminBtn.classList.add('flex');
+                adminBtn.onclick = () => window.location.href = 'admin.html';
+            }
         }
 
         function loadUserProfile() {
