@@ -433,6 +433,36 @@ function renderPrompts() {
         );
     }
 
+    // ORDENAMIENTO PERSONALIZADO
+    filteredPrompts.sort((a, b) => {
+        // 1. Likes (Mayor a menor)
+        const likesA = a.likes || 0;
+        const likesB = b.likes || 0;
+        if (likesB !== likesA) return likesB - likesA;
+
+        // 2. Prioridad específica al modelo "Gemini 2.5 Flash Image"
+        const isGeminiA = a.model === 'Gemini 2.5 Flash Image';
+        const isGeminiB = b.model === 'Gemini 2.5 Flash Image';
+        if (isGeminiA && !isGeminiB) return -1;
+        if (!isGeminiA && isGeminiB) return 1;
+
+        // 3. Categoría Visuales antes que otras (si tienen likes iguales)
+        const isVisualA = a.category === 'visuals';
+        const isVisualB = b.category === 'visuals';
+        if (isVisualA && !isVisualB) return -1;
+        if (!isVisualA && isGeminiB) return 1;
+
+        // 4. Visuales SIN imagen van al final de todo
+        if (isVisualA && isVisualB) {
+            const hasImageA = a.imageUrl && a.imageUrl.length > 0;
+            const hasImageB = b.imageUrl && b.imageUrl.length > 0;
+            if (hasImageA && !hasImageB) return -1;
+            if (!hasImageA && hasImageB) return 1;
+        }
+
+        return 0;
+    });
+
     // Paginación
     const totalItems = filteredPrompts.length;
     const totalPages = Math.ceil(totalItems / AppState.itemsPerPage);
