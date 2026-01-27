@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Perfil de Usuario - Wikiprompts</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { "primary": "#0a0a0a", "secondary": "#666666" },
+                    fontFamily: { "display": ["Space Grotesk", "sans-serif"], "body": ["Manrope", "sans-serif"] },
+                },
+            },
+        }
+    </script>
+</head>
+
+<body class="bg-white text-gray-900 font-body">
+    <div class="relative mx-auto flex h-full min-h-screen w-full max-w-md lg:max-w-none flex-col shadow-xl bg-white">
+
+        <!-- Header -->
+        <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 p-4 lg:px-12">
+            <div class="flex items-center justify-between">
+                <button onclick="goBack()"
+                    class="flex size-10 items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                </button>
+                <h1 class="text-2xl lg:text-3xl font-display font-bold tracking-tight">Perfil</h1>
+                <div class="size-10"></div>
+            </div>
+        </header>
+
+        <!-- Profile Info -->
+        <section class="px-6 lg:px-12 xl:px-24 py-8 lg:py-12">
+            <div class="flex flex-col items-center gap-6">
+                <!-- Avatar -->
+                <div id="userAvatar"
+                    class="size-32 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center"
+                    style="background-size: cover; background-position: center;">
+                    <span class="material-symbols-outlined text-gray-400 text-6xl">person</span>
+                </div>
+
+                <!-- Name & Username -->
+                <div class="text-center">
+                    <h2 id="userName" class="text-2xl font-display font-bold text-gray-900">Usuario</h2>
+                    <p id="userUsername" class="text-gray-500 mt-1">@username</p>
+                </div>
+
+                <!-- Bio -->
+                <p id="userBio" class="text-center text-gray-600 max-w-md">
+                    Explora y comparte increíbles prompts de IA.
+                </p>
+
+                <!-- Stats -->
+                <div class="flex gap-8 mt-4">
+                    <div class="text-center">
+                        <p id="promptCount" class="text-2xl font-display font-bold text-gray-900">0</p>
+                        <p class="text-sm text-gray-500">Prompts</p>
+                    </div>
+                    <div class="text-center cursor-pointer hover:opacity-70 transition-opacity">
+                        <p id="followersCount" class="text-2xl font-display font-bold text-gray-900">0</p>
+                        <p class="text-sm text-gray-500">Seguidores</p>
+                    </div>
+                    <div class="text-center cursor-pointer hover:opacity-70 transition-opacity">
+                        <p id="followingCount" class="text-2xl font-display font-bold text-gray-900">0</p>
+                        <p class="text-sm text-gray-500">Siguiendo</p>
+                    </div>
+                </div>
+
+                <!-- Follow Button -->
+                <button id="followBtn" onclick="toggleFollow()"
+                    class="hidden px-8 py-3 rounded-full font-semibold transition-all">
+                    <span id="followBtnText">Seguir</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- User Prompts -->
+        <section class="px-6 lg:px-12 xl:px-24 py-6">
+            <h3 class="text-xl font-display font-bold mb-4">Prompts Publicados</h3>
+            <div id="userPrompts" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Se cargarán dinámicamente -->
+            </div>
+            <div id="noPrompts" class="hidden text-center py-12 text-gray-500">
+                Este usuario aún no ha publicado prompts
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const API_URL = 'https://sentences-col-vice-antivirus.trycloudflare.com/api';
+        let currentUser = null;
+        let profileUser = null;
+        let username = null;
+
+        function goBack() {
+            window.history.back();
+        }
+
+        async function init() {
+            // Obtener username de la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            username = urlParams.get('username');
+
+            if (!username) {
+                alert('Usuario no especificado');
+                goBack();
+                return;
+            }
+
+            // Cargar usuario actual (si está logueado)
+            const storedUser = localStorage.getItem('currentUser');
+            if (storedUser) {
+                currentUser = JSON.parse(storedUser);
+            }
+
+            // Cargar perfil del usuario
+            await loadUserProfile();
+            await loadUserPrompts();
+            await loadStats();
+        }
+
+        async function loadUserProfile() {
+            try {
+                const users = await fetch(`${API_URL}/auth_users`).then(r => r.json());
+
+                // Buscar usuario por username
+                profileUser = users.find(u => {
+                    const userUsername = (u.username || '').toLowerCase();
+                    const userName = (u.name || '').toLowerCase();
+                    return userUsername === username.toLowerCase() || userName === username.toLowerCase();
+                });
+
+                if (!profileUser) {
+                    alert('Usuario no encontrado');
+                    goBack();
+                    return;
+                }
+
+                // Mostrar información del usuario
+                document.getElementById('userName').textContent = profileUser.name || 'Usuario';
+                document.getElementById('userUsername').textContent = '@' + (profileUser.username || username);
+                document.getElementById('userBio').textContent = profileUser.bio || 'Explora y comparte increíbles prompts de IA.';
+
+                // Mostrar avatar
+                const avatarDiv = document.getElementById('userAvatar');
+                if (profileUser.avatar) {
+                    avatarDiv.style.backgroundImage = `url(${profileUser.avatar})`;
+                    avatarDiv.innerHTML = '';
+                }
+
+                // Mostrar botón de seguir solo si NO es el usuario actual
+                if (currentUser) {
+                    const currentUsername = currentUser.username || currentUser.name.toLowerCase().replace(/\s+/g, '');
+                    const profileUsername = profileUser.username || profileUser.name.toLowerCase().replace(/\s+/g, '');
+
+                    if (currentUsername !== profileUsername) {
+                        document.getElementById('followBtn').classList.remove('hidden');
+                        await checkFollowStatus();
+                    }
+                }
+
+            } catch (error) {
+                console.error('Error cargando perfil:', error);
+                alert('Error al cargar el perfil');
+                goBack();
+            }
+        }
+
+        async function loadUserPrompts() {
+            try {
+                const prompts = await fetch(`${API_URL}/prompts`).then(r => r.json());
+
+                // Filtrar prompts del usuario
+                const authorIdentifier = '@' + (profileUser.username || username);
+                const userPrompts = prompts.filter(p => {
+                    return p.author === authorIdentifier ||
+                        p.author === profileUser.name ||
+                        p.author === '@' + profileUser.name.toLowerCase().replace(/\s+/g, '');
+                });
+
+                const container = document.getElementById('userPrompts');
+                const noPromptsDiv = document.getElementById('noPrompts');
+
+                if (userPrompts.length === 0) {
+                    container.classList.add('hidden');
+                    noPromptsDiv.classList.remove('hidden');
+                    return;
+                }
+
+                container.innerHTML = userPrompts.map(prompt => {
+                    const imageUrl = prompt.images?.[0] || prompt.imageUrl || '';
+                    return `
+                        <div onclick="viewPrompt('${prompt.id}')" class="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all cursor-pointer">
+                            ${imageUrl ? `
+                                <div class="aspect-video bg-gray-100 overflow-hidden">
+                                    <img src="${imageUrl}" alt="${prompt.title}" class="w-full h-full object-cover">
+                                </div>
+                            ` : ''}
+                            <div class="p-4">
+                                <h4 class="font-display font-bold text-gray-900 mb-2 line-clamp-2">${prompt.title}</h4>
+                                <div class="flex items-center gap-3 text-xs text-gray-500">
+                                    <span class="flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-[14px]">favorite</span>
+                                        ${prompt.likes || 0}
+                                    </span>
+                                    <span>${prompt.model}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Error cargando prompts:', error);
+            }
+        }
+
+        async function loadStats() {
+            try {
+                const [prompts, followers] = await Promise.all([
+                    fetch(`${API_URL}/prompts`).then(r => r.json()),
+                    fetch(`${API_URL}/followers`).then(r => r.json())
+                ]);
+
+                const authorIdentifier = '@' + (profileUser.username || username);
+                const userPrompts = prompts.filter(p => p.author === authorIdentifier || p.author === profileUser.name);
+
+                const userId = profileUser.id || profileUser.email;
+                const followersCount = followers.filter(f => f.followingUsername === authorIdentifier).length;
+                const followingCount = followers.filter(f => f.followerId === userId).length;
+
+                document.getElementById('promptCount').textContent = userPrompts.length;
+                document.getElementById('followersCount').textContent = followersCount;
+                document.getElementById('followingCount').textContent = followingCount;
+
+            } catch (error) {
+                console.error('Error cargando estadísticas:', error);
+            }
+        }
+
+        async function checkFollowStatus() {
+            if (!currentUser) return;
+
+            try {
+                const followers = await fetch(`${API_URL}/followers`).then(r => r.json());
+                const userId = currentUser.id || currentUser.email;
+                const authorIdentifier = '@' + (profileUser.username || username);
+
+                const isFollowing = followers.some(f =>
+                    f.followerId === userId && f.followingUsername === authorIdentifier
+                );
+
+                updateFollowButton(isFollowing);
+            } catch (error) {
+                console.error('Error verificando follow status:', error);
+            }
+        }
+
+        function updateFollowButton(isFollowing) {
+            const followBtn = document.getElementById('followBtn');
+            const followBtnText = document.getElementById('followBtnText');
+
+            if (isFollowing) {
+                followBtn.className = 'px-8 py-3 rounded-full font-semibold transition-all bg-gray-200 text-gray-700 hover:bg-gray-300';
+                followBtnText.textContent = 'Siguiendo';
+            } else {
+                followBtn.className = 'px-8 py-3 rounded-full font-semibold transition-all bg-black text-white hover:bg-gray-800';
+                followBtnText.textContent = 'Seguir';
+            }
+        }
+
+        async function toggleFollow() {
+            if (!currentUser) {
+                alert('Debes iniciar sesión para seguir usuarios');
+                window.location.href = 'auth.html';
+                return;
+            }
+
+            const followBtnText = document.getElementById('followBtnText');
+            const isFollowing = followBtnText.textContent === 'Siguiendo';
+            const authorIdentifier = '@' + (profileUser.username || username);
+
+            try {
+                const followers = await fetch(`${API_URL}/followers`).then(r => r.json());
+                const userId = currentUser.id || currentUser.email;
+
+                let newFollowers;
+                if (isFollowing) {
+                    newFollowers = followers.filter(f =>
+                        !(f.followerId === userId && f.followingUsername === authorIdentifier)
+                    );
+                } else {
+                    const newFollow = {
+                        id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+                        followerId: userId,
+                        followingUsername: authorIdentifier,
+                        createdAt: new Date().toISOString()
+                    };
+                    newFollowers = [...followers, newFollow];
+                }
+
+                await fetch(`${API_URL}/followers`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newFollowers)
+                });
+
+                updateFollowButton(!isFollowing);
+                await loadStats(); // Actualizar contador de seguidores
+
+            } catch (error) {
+                console.error('Error al seguir/dejar de seguir:', error);
+                alert('Error al actualizar. Intenta de nuevo.');
+            }
+        }
+
+        function viewPrompt(promptId) {
+            sessionStorage.setItem('currentPromptId', promptId);
+            window.location.href = 'prompt-detail.html';
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Importar desde GitHub - Wikiprompts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+</head>
+
+<body class="bg-gray-50 p-4 md:p-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
+            <div class="flex items-center gap-4 mb-6">
+                <button onclick="window.location.href='admin.html'"
+                    class="flex items-center justify-center size-10 rounded-full hover:bg-gray-100 transition-colors">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                </button>
+                <h1 class="text-3xl font-bold">🚀 Importar Prompts desde GitHub</h1>
+            </div>
+
+            <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-blue-700">
+                            <strong>Repositorio:</strong> awesome-nano-banana<br>
+                            <strong>Casos disponibles:</strong> ~100 prompts de Gemini 2.5 Flash Image<br>
+                            <strong>Nota:</strong> Este proceso puede tardar varios minutos
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4 mb-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">URL del README:</label>
+                    <input type="text" id="repoUrl"
+                        value="https://raw.githubusercontent.com/JimmyLv/awesome-nano-banana/main/README.md"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Límite de prompts a importar:</label>
+                    <input type="number" id="limit" value="20" min="1" max="100"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                    <p class="text-xs text-gray-500 mt-1">Recomendado: 10-20 para pruebas, máximo 100</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Autor por defecto:</label>
+                    <input type="text" id="defaultAuthor" value="@santyguz77"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                </div>
+            </div>
+
+            <button onclick="startImport()" id="importBtn"
+                class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined">download</span>
+                Iniciar Importación
+            </button>
+
+            <div id="progress" class="mt-6 hidden">
+                <div class="bg-gray-100 rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="font-semibold">Progreso:</h3>
+                        <span id="progressText" class="text-sm text-gray-600">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div id="progressBar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+                            style="width: 0%"></div>
+                    </div>
+                    <div id="statusLog"
+                        class="mt-4 max-h-96 overflow-y-auto bg-white rounded p-3 border border-gray-200">
+                        <pre id="logContent" class="text-xs text-gray-700 whitespace-pre-wrap"></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div id="results" class="mt-6 hidden">
+                <div class="bg-green-50 border-l-4 border-green-400 p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-green-700">
+                                <strong id="successCount">0</strong> prompts importados exitosamente
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://sentences-col-vice-antivirus.trycloudflare.com/api';
+        let importedCount = 0;
+
+        function log(message, isError = false) {
+            const logContent = document.getElementById('logContent');
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = isError ? '❌' : '✅';
+            logContent.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            logContent.scrollTop = logContent.scrollHeight;
+        }
+
+        function updateProgress(current, total) {
+            const percent = Math.round((current / total) * 100);
+            document.getElementById('progressBar').style.width = `${percent}%`;
+            document.getElementById('progressText').textContent = `${percent}% (${current}/${total})`;
+        }
+
+        async function startImport() {
+            const repoUrl = document.getElementById('repoUrl').value;
+            const limit = parseInt(document.getElementById('limit').value);
+            const defaultAuthor = document.getElementById('defaultAuthor').value;
+
+            // Mostrar progreso
+            document.getElementById('progress').classList.remove('hidden');
+            document.getElementById('results').classList.add('hidden');
+            document.getElementById('logContent').textContent = '';
+            document.getElementById('importBtn').disabled = true;
+            document.getElementById('importBtn').classList.add('opacity-50', 'cursor-not-allowed');
+
+            importedCount = 0;
+
+            try {
+                log('Descargando README desde GitHub...');
+
+                // Fetch README
+                const response = await fetch(repoUrl);
+                if (!response.ok) {
+                    throw new Error(`Error al descargar README: ${response.status}`);
+                }
+
+                const markdown = await response.text();
+                log('README descargado correctamente');
+
+                // Parsear casos
+                log('Parseando casos del README...');
+                const cases = parseMarkdownCases(markdown, limit);
+                log(`Encontrados ${cases.length} casos para importar`);
+
+                // Obtener prompts existentes
+                const existingPrompts = await fetch(`${API_URL}/prompts`).then(r => r.json());
+                log(`Prompts existentes en la base de datos: ${existingPrompts.length}`);
+
+                // Importar casos
+                for (let i = 0; i < cases.length; i++) {
+                    const caseData = cases[i];
+                    updateProgress(i + 1, cases.length);
+
+                    try {
+                        const prompt = convertCaseToPrompt(caseData, defaultAuthor);
+
+                        // Verificar si ya existe
+                        const exists = existingPrompts.some(p => p.title === prompt.title);
+                        if (exists) {
+                            log(`⚠️ Saltando "${prompt.title}" (ya existe)`, false);
+                            continue;
+                        }
+
+                        // Guardar usando PUT (método seguro)
+                        await fetch(`${API_URL}/prompts/${prompt.id}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(prompt)
+                        });
+
+                        importedCount++;
+                        log(`Importado: ${prompt.title}`);
+
+                        // Pequeña pausa para no sobrecargar el servidor
+                        await new Promise(resolve => setTimeout(resolve, 100));
+
+                    } catch (error) {
+                        log(`Error importando caso ${i + 1}: ${error.message}`, true);
+                    }
+                }
+
+                // Mostrar resultados
+                document.getElementById('results').classList.remove('hidden');
+                document.getElementById('successCount').textContent = importedCount;
+                log(`\n🎉 Importación completada: ${importedCount} prompts nuevos`);
+
+            } catch (error) {
+                log(`Error fatal: ${error.message}`, true);
+                console.error('Error completo:', error);
+            } finally {
+                document.getElementById('importBtn').disabled = false;
+                document.getElementById('importBtn').classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        function parseMarkdownCases(markdown, limit) {
+            const cases = [];
+
+            // Regex mejorado para capturar todo el caso incluyendo imágenes
+            const caseRegex = /###\s*Case\s+(\d+):\s*(.+?)\s*\(by\s+(.+?)\)([\s\S]*?)(?=###\s*Case\s+\d+:|$)/g;
+
+            let match;
+            let count = 0;
+
+            while ((match = caseRegex.exec(markdown)) !== null && count < limit) {
+                const [, caseNumber, title, author, content] = match;
+
+                // Extraer prompt del contenido
+                const promptMatch = content.match(/```\s*([\s\S]*?)```/);
+                const prompt = promptMatch ? promptMatch[1].trim() : '';
+
+                // Extraer URLs de imágenes (formato markdown: ![](url) o <img src="url">)
+                const imageUrls = [];
+
+                // Buscar imágenes en formato markdown ![](url)
+                const mdImageRegex = /!\[.*?\]\((https?:\/\/[^\)]+)\)/g;
+                let imgMatch;
+                while ((imgMatch = mdImageRegex.exec(content)) !== null) {
+                    imageUrls.push(imgMatch[1]);
+                }
+
+                // Buscar imágenes en formato HTML <img src="url">
+                const htmlImageRegex = /<img[^>]+src="(https?:\/\/[^"]+)"/g;
+                while ((imgMatch = htmlImageRegex.exec(content)) !== null) {
+                    imageUrls.push(imgMatch[1]);
+                }
+
+                cases.push({
+                    number: parseInt(caseNumber),
+                    title: title.trim(),
+                    author: author.trim(),
+                    prompt: prompt,
+                    images: imageUrls
+                });
+
+                count++;
+            }
+
+            return cases;
+        }
+
+        function convertCaseToPrompt(caseData, defaultAuthor) {
+            // Generar ID único
+            const id = `github-case-${caseData.number}-${Date.now().toString(36)}`;
+
+            // Limpiar autor
+            let author = caseData.author;
+            if (author.startsWith('@')) {
+                author = author;
+            } else if (author.startsWith('[')) {
+                // Extraer username de markdown link
+                const match = author.match(/\[@(.+?)\]/);
+                author = match ? '@' + match[1] : defaultAuthor;
+            } else {
+                author = defaultAuthor;
+            }
+
+            return {
+                id: id,
+                title: caseData.title,
+                category: 'visuals', // Todos son de imágenes
+                type: 'image',
+                model: 'Gemini 2.5 Flash Image',
+                prompt: caseData.prompt,
+                description: `Caso ${caseData.number} del repositorio awesome-nano-banana`,
+                author: author,
+                likes: 0,
+                createdAt: new Date().toISOString(),
+                images: caseData.images || [],
+                imageUrl: caseData.images && caseData.images.length > 0 ? caseData.images[0] : ''
+            };
+        }
+    </script>
+</body>
+
+</html>

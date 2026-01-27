@@ -1,17 +1,21 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta name="theme-color" content="#000000"/>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#000000" />
     <title>Perfil - Wikiprompts</title>
-    
-    <link rel="manifest" href="/manifest.json"/>
-    <link rel="icon" type="image/png" href="/image.png"/>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    
+
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/png" href="/image.png" />
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script id="tailwind-config">
         tailwind.config = {
@@ -30,18 +34,23 @@
 </head>
 
 <body class="font-display antialiased text-slate-900 bg-white">
-    <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden max-w-md lg:max-w-none mx-auto shadow-sm border-x border-slate-50 pb-28 lg:pb-8">
-        
+    <div
+        class="relative flex min-h-screen w-full flex-col overflow-x-hidden max-w-md lg:max-w-none mx-auto shadow-sm border-x border-slate-50 pb-28 lg:pb-8">
+
         <!-- Top Navigation -->
-        <div class="flex items-center justify-between p-4 lg:px-12 lg:py-6 bg-white/80 backdrop-blur-md sticky top-0 z-50">
-            <button onclick="window.location.href='index.html'" class="flex size-10 lg:size-12 items-center justify-center rounded-full hover:bg-slate-100 transition-colors">
+        <div
+            class="flex items-center justify-between p-4 lg:px-12 lg:py-6 bg-white/80 backdrop-blur-md sticky top-0 z-50">
+            <button onclick="window.location.href='index.html'"
+                class="flex size-10 lg:size-12 items-center justify-center rounded-full hover:bg-slate-100 transition-colors">
                 <span class="material-symbols-outlined text-slate-900 text-2xl">arrow_back</span>
             </button>
             <div class="flex gap-2">
-                <button class="flex size-10 items-center justify-center rounded-full hover:bg-slate-100 transition-colors">
+                <button
+                    class="flex size-10 items-center justify-center rounded-full hover:bg-slate-100 transition-colors">
                     <span class="material-symbols-outlined text-slate-900 text-2xl">share</span>
                 </button>
-                <button class="flex size-10 items-center justify-center rounded-full hover:bg-slate-100 transition-colors">
+                <button
+                    class="flex size-10 items-center justify-center rounded-full hover:bg-slate-100 transition-colors">
                     <span class="material-symbols-outlined text-slate-900 text-2xl">settings</span>
                 </button>
             </div>
@@ -50,14 +59,16 @@
         <!-- Profile Header -->
         <div class="flex flex-col items-center px-6 lg:px-12 pt-2 lg:pt-4 pb-8 lg:pb-12">
             <div class="relative group cursor-pointer">
-                <div id="profileAvatar" class="size-28 rounded-full bg-cover bg-center border-2 border-white shadow-sm overflow-hidden bg-gray-200 flex items-center justify-center">
+                <div id="profileAvatar"
+                    class="size-28 rounded-full bg-cover bg-center border-2 border-white shadow-sm overflow-hidden bg-gray-200 flex items-center justify-center">
                     <span class="material-symbols-outlined text-gray-400 text-5xl">person</span>
                 </div>
-                <div class="absolute inset-0 bg-black/10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <div
+                    class="absolute inset-0 bg-black/10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <span class="material-symbols-outlined text-white">edit</span>
                 </div>
             </div>
-            
+
             <div class="mt-4 flex flex-col items-center text-center">
                 <h1 id="profileName" class="text-2xl font-bold tracking-tight text-slate-900">Cargando...</h1>
                 <p id="profileUsername" class="text-slate-500 text-sm font-medium mt-1">@username</p>
@@ -65,17 +76,20 @@
                     Bio del usuario
                 </p>
             </div>
-            
+
             <div class="flex flex-col gap-3 mt-6">
                 <div class="flex gap-3">
-                    <button onclick="editProfile()" class="flex h-10 px-6 items-center justify-center rounded-md bg-primary text-white text-sm font-bold shadow-sm hover:bg-[#233642] transition-transform active:scale-95">
+                    <button onclick="editProfile()"
+                        class="flex h-10 px-6 items-center justify-center rounded-md bg-primary text-white text-sm font-bold shadow-sm hover:bg-[#233642] transition-transform active:scale-95">
                         Editar Perfil
                     </button>
-                    <button onclick="logout()" class="flex h-10 px-6 items-center justify-center rounded-md border border-gray-300 text-gray-700 text-sm font-bold hover:bg-gray-50 transition-transform active:scale-95">
+                    <button onclick="logout()"
+                        class="flex h-10 px-6 items-center justify-center rounded-md border border-gray-300 text-gray-700 text-sm font-bold hover:bg-gray-50 transition-transform active:scale-95">
                         Cerrar Sesión
                     </button>
                 </div>
-                <button id="adminBtn" class="hidden items-center justify-center gap-2 h-10 px-6 rounded-md bg-red-600 text-white text-sm font-bold shadow-sm hover:bg-red-700 transition-transform active:scale-95">
+                <button id="adminBtn"
+                    class="hidden items-center justify-center gap-2 h-10 px-6 rounded-md bg-red-600 text-white text-sm font-bold shadow-sm hover:bg-red-700 transition-transform active:scale-95">
                     <span class="material-symbols-outlined text-[18px]">shield</span>
                     Panel de Administración
                 </button>
@@ -86,17 +100,19 @@
         <div class="flex w-full items-center justify-center py-4 border-t border-b border-slate-100">
             <div class="flex items-center gap-6 md:gap-12">
                 <div class="flex flex-col items-center">
-                    <span class="text-xl font-bold text-slate-900">42</span>
+                    <span id="promptsCount" class="text-xl font-bold text-slate-900">0</span>
                     <span class="text-xs text-slate-500 uppercase tracking-wide font-medium mt-1">Prompts</span>
                 </div>
                 <div class="h-8 w-px bg-slate-200"></div>
-                <div class="flex flex-col items-center">
-                    <span class="text-xl font-bold text-slate-900">1.2k</span>
+                <div class="flex flex-col items-center cursor-pointer hover:opacity-70 transition-opacity"
+                    onclick="showFollowers()">
+                    <span id="followersCount" class="text-xl font-bold text-slate-900">0</span>
                     <span class="text-xs text-slate-500 uppercase tracking-wide font-medium mt-1">Seguidores</span>
                 </div>
                 <div class="h-8 w-px bg-slate-200"></div>
-                <div class="flex flex-col items-center">
-                    <span class="text-xl font-bold text-slate-900">85</span>
+                <div class="flex flex-col items-center cursor-pointer hover:opacity-70 transition-opacity"
+                    onclick="showFollowing()">
+                    <span id="followingCount" class="text-xl font-bold text-slate-900">0</span>
                     <span class="text-xs text-slate-500 uppercase tracking-wide font-medium mt-1">Siguiendo</span>
                 </div>
             </div>
@@ -107,11 +123,14 @@
             <div class="flex w-full">
                 <a class="flex-1 py-4 text-center relative group" href="#" onclick="switchTab('myPrompts', event)">
                     <span class="text-sm font-bold text-primary" id="tab-myPrompts">Mis Prompts</span>
-                    <div class="absolute bottom-0 left-0 w-full h-[2px] bg-primary rounded-t-full" id="indicator-myPrompts"></div>
+                    <div class="absolute bottom-0 left-0 w-full h-[2px] bg-primary rounded-t-full"
+                        id="indicator-myPrompts"></div>
                 </a>
                 <a class="flex-1 py-4 text-center relative group" href="#" onclick="switchTab('saved', event)">
-                    <span class="text-sm font-medium text-slate-400 group-hover:text-slate-600 transition-colors" id="tab-saved">Guardados</span>
-                    <div class="absolute bottom-0 left-0 w-full h-[2px] bg-transparent group-hover:bg-slate-200 rounded-t-full transition-colors" id="indicator-saved"></div>
+                    <span class="text-sm font-medium text-slate-400 group-hover:text-slate-600 transition-colors"
+                        id="tab-saved">Guardados</span>
+                    <div class="absolute bottom-0 left-0 w-full h-[2px] bg-transparent group-hover:bg-slate-200 rounded-t-full transition-colors"
+                        id="indicator-saved"></div>
                 </a>
             </div>
         </div>
@@ -122,36 +141,47 @@
         </div>
 
         <!-- Bottom Navigation (Mobile Only) -->
-        <nav class="lg:hidden fixed bottom-8 left-1/2 -translate-x-1/2 w-auto bg-white/80 backdrop-blur-xl border border-white/20 ring-1 ring-black/5 rounded-full shadow-subtle h-14 flex items-center justify-center px-2 gap-1 z-50">
-            <button onclick="window.location.href='index.html'" class="nav-btn flex items-center justify-center w-12 h-12 rounded-full hover:bg-black/5 text-gray-400 transition-all">
+        <nav
+            class="lg:hidden fixed bottom-8 left-1/2 -translate-x-1/2 w-auto bg-white/80 backdrop-blur-xl border border-white/20 ring-1 ring-black/5 rounded-full shadow-subtle h-14 flex items-center justify-center px-2 gap-1 z-50">
+            <button onclick="window.location.href='index.html'"
+                class="nav-btn flex items-center justify-center w-12 h-12 rounded-full hover:bg-black/5 text-gray-400 transition-all">
                 <span class="material-symbols-outlined text-[20px]">home</span>
             </button>
-            <button onclick="window.location.href='explore.html'" class="nav-btn flex items-center justify-center w-12 h-12 rounded-full hover:bg-black/5 text-gray-400 transition-all">
+            <button onclick="window.location.href='explore.html'"
+                class="nav-btn flex items-center justify-center w-12 h-12 rounded-full hover:bg-black/5 text-gray-400 transition-all">
                 <span class="material-symbols-outlined text-[20px]">explore</span>
             </button>
-            <button onclick="window.location.href='bookmarks.html'" class="nav-btn flex items-center justify-center w-12 h-12 rounded-full hover:bg-black/5 text-gray-400 transition-all">
+            <button onclick="window.location.href='bookmarks.html'"
+                class="nav-btn flex items-center justify-center w-12 h-12 rounded-full hover:bg-black/5 text-gray-400 transition-all">
                 <span class="material-symbols-outlined text-[20px]">bookmark</span>
             </button>
-            <button class="nav-btn flex items-center justify-center w-12 h-12 rounded-full bg-black text-white shadow-lg shadow-black/20 transition-all">
+            <button
+                class="nav-btn flex items-center justify-center w-12 h-12 rounded-full bg-black text-white shadow-lg shadow-black/20 transition-all">
                 <span class="material-symbols-outlined text-[20px]">person</span>
             </button>
         </nav>
 
         <!-- Floating Add Button -->
-        <button onclick="window.location.href='contribute.html'" class="fixed bottom-24 lg:bottom-8 right-6 lg:right-12 flex items-center justify-center size-14 lg:size-16 rounded-full bg-black text-white shadow-lg hover:scale-105 transition-transform hover:shadow-xl z-40">
+        <button onclick="window.location.href='contribute.html'"
+            class="fixed bottom-24 lg:bottom-8 right-6 lg:right-12 flex items-center justify-center size-14 lg:size-16 rounded-full bg-black text-white shadow-lg hover:scale-105 transition-transform hover:shadow-xl z-40">
             <span class="material-symbols-outlined text-[24px] lg:text-[28px]">add</span>
         </button>
 
         <!-- Gradient Fade at Bottom (Mobile Only) -->
-        <div class="lg:hidden fixed bottom-0 left-0 w-full h-24 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none z-40"></div>
+        <div
+            class="lg:hidden fixed bottom-0 left-0 w-full h-24 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none z-40">
+        </div>
 
         <!-- Edit Profile Modal -->
-        <div id="editModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div id="editModal"
+            class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
                 <!-- Modal Header -->
-                <div class="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between rounded-t-2xl">
+                <div
+                    class="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between rounded-t-2xl">
                     <h2 class="text-xl font-display font-bold">Editar Perfil</h2>
-                    <button onclick="closeEditModal()" class="flex items-center justify-center size-8 rounded-full hover:bg-gray-100 transition-colors">
+                    <button onclick="closeEditModal()"
+                        class="flex items-center justify-center size-8 rounded-full hover:bg-gray-100 transition-colors">
                         <span class="material-symbols-outlined text-gray-600">close</span>
                     </button>
                 </div>
@@ -160,25 +190,28 @@
                 <form id="editProfileForm" onsubmit="saveProfile(event)" class="p-6 flex flex-col gap-5">
                     <!-- Avatar Preview -->
                     <div class="flex flex-col items-center gap-3">
-                        <div id="editAvatar" class="size-24 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
-                            <span class="material-symbols-outlined text-gray-400 text-4xl">person</span>
+                        <div class="relative group">
+                            <div id="editAvatar"
+                                class="size-24 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
+                                <span class="material-symbols-outlined text-gray-400 text-4xl">person</span>
+                            </div>
+                            <label
+                                class="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                                <span class="material-symbols-outlined text-white text-2xl">photo_camera</span>
+                                <input type="file" id="avatarInput" accept="image/*" onchange="previewAvatar(event)"
+                                    class="hidden">
+                            </label>
                         </div>
-                        <label class="text-sm font-medium text-gray-600 cursor-pointer hover:text-black transition-colors">
-                            <input type="file" id="avatarInput" accept="image/*" onchange="previewAvatar(event)" class="hidden">
-                            Cambiar foto de perfil
-                        </label>
+                        <p class="text-sm font-medium text-gray-600">
+                            Click en la foto para cambiar
+                        </p>
                     </div>
 
                     <!-- Name -->
                     <div>
                         <label class="text-sm font-semibold text-gray-700 mb-2 block">Nombre</label>
-                        <input 
-                            type="text" 
-                            id="editName" 
-                            required
-                            placeholder="Tu nombre"
-                            class="w-full h-12 px-4 bg-white border border-gray-200 rounded-xl focus:border-black focus:ring-0 transition-colors"
-                        />
+                        <input type="text" id="editName" required placeholder="Tu nombre"
+                            class="w-full h-12 px-4 bg-white border border-gray-200 rounded-xl focus:border-black focus:ring-0 transition-colors" />
                     </div>
 
                     <!-- Username -->
@@ -186,35 +219,27 @@
                         <label class="text-sm font-semibold text-gray-700 mb-2 block">Username</label>
                         <div class="relative">
                             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">@</span>
-                            <input 
-                                type="text" 
-                                id="editUsername" 
-                                required
-                                placeholder="username"
-                                class="w-full h-12 pl-8 pr-4 bg-white border border-gray-200 rounded-xl focus:border-black focus:ring-0 transition-colors"
-                            />
+                            <input type="text" id="editUsername" required placeholder="username"
+                                class="w-full h-12 pl-8 pr-4 bg-white border border-gray-200 rounded-xl focus:border-black focus:ring-0 transition-colors" />
                         </div>
                     </div>
 
                     <!-- Bio -->
                     <div>
                         <label class="text-sm font-semibold text-gray-700 mb-2 block">Biografía</label>
-                        <textarea 
-                            id="editBio" 
-                            rows="3"
-                            placeholder="Cuéntanos sobre ti..."
-                            maxlength="160"
-                            class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:border-black focus:ring-0 transition-colors resize-none"
-                        ></textarea>
+                        <textarea id="editBio" rows="3" placeholder="Cuéntanos sobre ti..." maxlength="160"
+                            class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:border-black focus:ring-0 transition-colors resize-none"></textarea>
                         <p class="text-xs text-gray-400 mt-1">Máximo 160 caracteres</p>
                     </div>
 
                     <!-- Actions -->
                     <div class="flex gap-3 pt-4">
-                        <button type="button" onclick="closeEditModal()" class="flex-1 h-12 rounded-xl border border-gray-300 font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
+                        <button type="button" onclick="closeEditModal()"
+                            class="flex-1 h-12 rounded-xl border border-gray-300 font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
                             Cancelar
                         </button>
-                        <button type="submit" class="flex-1 h-12 rounded-xl bg-black text-white font-semibold hover:bg-gray-800 transition-colors">
+                        <button type="submit"
+                            class="flex-1 h-12 rounded-xl bg-black text-white font-semibold hover:bg-gray-800 transition-colors">
                             Guardar
                         </button>
                     </div>
@@ -223,11 +248,108 @@
         </div>
     </div>
 
+    <!-- Modal de Seguidores -->
+    <div id="followersModal"
+        class="hidden fixed inset-0 z-[9998] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 max-h-[80vh] overflow-hidden flex flex-col">
+            <div class="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+                <h2 class="text-xl font-display font-bold">Seguidores</h2>
+                <button onclick="closeFollowersModal()"
+                    class="flex items-center justify-center size-8 rounded-full hover:bg-gray-100 transition-colors">
+                    <span class="material-symbols-outlined text-gray-600">close</span>
+                </button>
+            </div>
+            <div id="followersList" class="p-6 overflow-y-auto flex-1">
+                <!-- Se cargará dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Siguiendo -->
+    <div id="followingModal"
+        class="hidden fixed inset-0 z-[9998] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 max-h-[80vh] overflow-hidden flex flex-col">
+            <div class="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+                <h2 class="text-xl font-display font-bold">Siguiendo</h2>
+                <button onclick="closeFollowingModal()"
+                    class="flex items-center justify-center size-8 rounded-full hover:bg-gray-100 transition-colors">
+                    <span class="material-symbols-outlined text-gray-600">close</span>
+                </button>
+            </div>
+            <div id="followingList" class="p-6 overflow-y-auto flex-1">
+                <!-- Se cargará dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Cargando -->
+    <div id="loadingModal"
+        class="hidden fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity duration-300">
+        <div
+            class="bg-white rounded-2xl shadow-2xl p-8 flex flex-col items-center gap-4 animate-in fade-in zoom-in duration-300">
+            <div class="size-12 rounded-full border-4 border-gray-200 border-t-black animate-spin"></div>
+            <p class="font-medium text-gray-900">Guardando cambios...</p>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-[9999] flex flex-col gap-3 pointer-events-none">
+        <!-- Toasts se agregarán aquí dinámicamente -->
+    </div>
+
     <script>
         const API_URL = 'https://sentences-col-vice-antivirus.trycloudflare.com/api';
 
         let currentTab = 'myPrompts';
         let currentUser = null;
+
+        // Función para mostrar notificaciones toast
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+
+            const icons = {
+                success: 'check_circle',
+                error: 'error',
+                info: 'info',
+                warning: 'warning'
+            };
+
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                info: 'bg-blue-500',
+                warning: 'bg-yellow-500'
+            };
+
+            toast.className = `${colors[type]} text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 pointer-events-auto transform transition-all duration-300 translate-x-0 opacity-100 max-w-md`;
+            toast.innerHTML = `
+                <span class="material-symbols-outlined text-2xl">${icons[type]}</span>
+                <span class="font-medium flex-1">${message}</span>
+                <button onclick="this.parentElement.remove()" class="hover:bg-white/20 rounded-full p-1 transition-colors">
+                    <span class="material-symbols-outlined text-xl">close</span>
+                </button>
+            `;
+
+            // Animación de entrada
+            toast.style.transform = 'translateX(400px)';
+            toast.style.opacity = '0';
+
+            container.appendChild(toast);
+
+            // Trigger animación
+            setTimeout(() => {
+                toast.style.transform = 'translateX(0)';
+                toast.style.opacity = '1';
+            }, 10);
+
+            // Auto-remover después de 4 segundos
+            setTimeout(() => {
+                toast.style.transform = 'translateX(400px)';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
 
         async function init() {
             // Cargar usuario actual
@@ -236,23 +358,24 @@
                 window.location.href = 'auth.html';
                 return;
             }
-            
+
             currentUser = JSON.parse(storedUser);
             loadUserProfile();
+            await loadStats(); // Cargar estadísticas
             await renderPrompts();
-            
+
             // Mostrar botón de admin si el usuario es administrador
             checkAndShowAdminButton();
         }
-        
+
         function checkAndShowAdminButton() {
             const adminBtn = document.getElementById('adminBtn');
             if (!adminBtn || !currentUser) return;
-            
+
             // Verificar si es el administrador
-            const isAdmin = currentUser.email === 'santyguz777@gmail.com' || 
-                           currentUser.username === 'santyguz77';
-            
+            const isAdmin = currentUser.email === 'santyguz777@gmail.com' ||
+                currentUser.username === 'santyguz77';
+
             if (isAdmin) {
                 adminBtn.classList.remove('hidden');
                 adminBtn.classList.add('flex');
@@ -267,7 +390,7 @@
                 avatarDiv.style.backgroundImage = `url(${currentUser.avatar})`;
                 avatarDiv.innerHTML = '';
             }
-            
+
             // Actualizar información
             document.getElementById('profileName').textContent = currentUser.name || 'Usuario';
             document.getElementById('profileUsername').textContent = `@${currentUser.username || 'username'}`;
@@ -280,7 +403,7 @@
             document.getElementById('editName').value = currentUser.name || '';
             document.getElementById('editUsername').value = currentUser.username || '';
             document.getElementById('editBio').value = currentUser.bio || '';
-            
+
             // Actualizar avatar preview
             const editAvatar = document.getElementById('editAvatar');
             if (currentUser.avatar) {
@@ -295,76 +418,143 @@
             document.getElementById('editModal').classList.add('hidden');
         }
 
-        function previewAvatar(event) {
+        // Función para mostrar/ocultar carga
+        function toggleLoading(show) {
+            const modal = document.getElementById('loadingModal');
+            if (show) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        // Utilidad para comprimir imágenes
+        function compressImage(file, maxWidth = 500, quality = 0.7) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = event => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        // Convertir a JPEG comprimido
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                    img.onerror = error => reject(error);
+                };
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        async function previewAvatar(event) {
             const file = event.target.files[0];
             if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
+                // Validación de tamaño inicial (ej. 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    showToast('La imagen es demasiado grande. Máximo 5MB.', 'error');
+                    return;
+                }
+
+                try {
+                    // Mostrar indicar de procesando en la foto
                     const editAvatar = document.getElementById('editAvatar');
-                    editAvatar.style.backgroundImage = `url(${e.target.result})`;
+                    editAvatar.classList.add('opacity-50');
+
+                    const compressedBase64 = await compressImage(file);
+
+                    currentUser.avatarTemp = compressedBase64;
+
+                    editAvatar.style.backgroundImage = `url(${compressedBase64})`;
                     editAvatar.style.backgroundSize = 'cover';
                     editAvatar.style.backgroundPosition = 'center';
                     editAvatar.innerHTML = '';
-                    
-                    // Guardar para enviar
-                    currentUser.avatarTemp = e.target.result;
-                };
-                reader.readAsDataURL(file);
+                    editAvatar.classList.remove('opacity-50');
+
+                } catch (error) {
+                    console.error('Error procesando imagen:', error);
+                    showToast('Error al procesar la imagen', 'error');
+                    document.getElementById('editAvatar').classList.remove('opacity-50');
+                }
             }
         }
 
         async function saveProfile(event) {
             event.preventDefault();
-            
+            toggleLoading(true);
+
             const name = document.getElementById('editName').value;
             const username = document.getElementById('editUsername').value;
             const bio = document.getElementById('editBio').value;
-            
+
             try {
                 const updateData = { name, username, bio };
-                
+
                 // Si hay avatar temporal, agregarlo
                 if (currentUser.avatarTemp) {
                     updateData.avatar = currentUser.avatarTemp;
                 }
-                
+
                 const headers = {
                     'Content-Type': 'application/json'
                 };
-                
+
                 // Agregar token de autenticación
                 if (currentUser && currentUser.id) {
                     headers['Authorization'] = `Bearer ${currentUser.id}`;
                 }
-                
+
                 const response = await fetch(`${API_URL}/auth/profile`, {
                     method: 'PUT',
                     headers: headers,
                     credentials: 'include',
                     body: JSON.stringify(updateData)
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (response.ok) {
                     // Actualizar usuario local
-                    currentUser = data.user;
-                    localStorage.setItem('currentUser', JSON.stringify(data.user));
-                    
+                    const updatedUser = data.user;
+                    currentUser = updatedUser;
+
+                    try {
+                        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+                    } catch (storageError) {
+                        console.error('Error guardando en localStorage:', storageError);
+                        showToast('Perfil guardado, pero hubo un error de almacenamiento local. Por favor recarga la página', 'warning');
+                    }
+
                     // Actualizar UI
                     loadUserProfile();
-                    
+
                     // Cerrar modal
                     closeEditModal();
-                    
+
                     // Mostrar mensaje de éxito
-                    alert('Perfil actualizado correctamente');
+                    showToast('Perfil actualizado correctamente', 'success');
                 } else {
-                    alert(data.error || 'Error al actualizar perfil');
+                    showToast(data.error || 'Error al actualizar perfil', 'error');
                 }
             } catch (error) {
-                alert('Error de conexión. Intenta de nuevo.');
+                showToast('Error de conexión. Intenta de nuevo.', 'error');
                 console.error('Error updating profile:', error);
+            } finally {
+                // Asegurarse de ocultar la carga siempre
+                toggleLoading(false);
             }
         }
 
@@ -384,12 +574,12 @@
         function switchTab(tab, event) {
             event.preventDefault();
             currentTab = tab;
-            
+
             // Update tab styles
             ['myPrompts', 'saved'].forEach(t => {
                 const tabEl = document.getElementById(`tab-${t}`);
                 const indicatorEl = document.getElementById(`indicator-${t}`);
-                
+
                 if (t === tab) {
                     tabEl.classList.remove('text-slate-400', 'group-hover:text-slate-600');
                     tabEl.classList.add('text-primary', 'font-bold');
@@ -402,7 +592,7 @@
                     indicatorEl.classList.add('bg-transparent', 'group-hover:bg-slate-200');
                 }
             });
-            
+
             renderPrompts();
         }
 
@@ -412,17 +602,17 @@
                     fetch(`${API_URL}/prompts`).then(r => r.json()),
                     fetch(`${API_URL}/bookmarks`).then(r => r.json())
                 ]);
-                
+
                 const container = document.getElementById('promptsList');
-                
+
                 // Filtrar prompts del usuario actual
                 const userIdentifier = currentUser.username ? '@' + currentUser.username : currentUser.name;
                 const userId = currentUser.id || currentUser.email;
-                
+
                 // Filtrar bookmarks del usuario actual
                 const userBookmarks = bookmarks.filter(b => b.userId === userId);
-                
-                let displayPrompts = currentTab === 'myPrompts' 
+
+                let displayPrompts = currentTab === 'myPrompts'
                     ? prompts.filter(p => p.author === userIdentifier)
                     : prompts.filter(p => userBookmarks.some(b => b.promptId === p.id));
 
@@ -471,6 +661,156 @@
             }
         }
 
+        // Cargar estadísticas del perfil
+        async function loadStats() {
+            try {
+                const userId = currentUser.id || currentUser.email;
+                const userIdentifier = currentUser.username ? '@' + currentUser.username : currentUser.name;
+
+                // Cargar prompts, seguidores y siguiendo
+                const [prompts, followers] = await Promise.all([
+                    fetch(`${API_URL}/prompts`).then(r => r.json()),
+                    fetch(`${API_URL}/followers`).then(r => r.json())
+                ]);
+
+                // Contar prompts del usuario
+                const userPrompts = prompts.filter(p => p.author === userIdentifier);
+                document.getElementById('promptsCount').textContent = userPrompts.length;
+
+                // Contar seguidores (quienes siguen a este usuario)
+                const userFollowers = followers.filter(f => f.followingUsername === userIdentifier);
+                document.getElementById('followersCount').textContent = userFollowers.length;
+
+                // Contar siguiendo (a quienes sigue este usuario)
+                const userFollowing = followers.filter(f => f.followerId === userId);
+                document.getElementById('followingCount').textContent = userFollowing.length;
+
+            } catch (error) {
+                console.error('Error cargando estadísticas:', error);
+            }
+        }
+
+        // Mostrar lista de seguidores
+        async function showFollowers() {
+            try {
+                const userId = currentUser.id || currentUser.email;
+                const userIdentifier = currentUser.username ? '@' + currentUser.username : currentUser.name;
+                const followers = await fetch(`${API_URL}/followers`).then(r => r.json());
+
+                // Obtener IDs de seguidores
+                const followerIds = followers
+                    .filter(f => f.followingUsername === userIdentifier)
+                    .map(f => f.followerId);
+
+                if (followerIds.length === 0) {
+                    showToast('Aún no tienes seguidores', 'info');
+                    return;
+                }
+
+                // Cargar información de usuarios
+                const users = await fetch(`${API_URL}/auth_users`).then(r => r.json());
+
+                // Crear lista de seguidores
+                const followersList = document.getElementById('followersList');
+                followersList.innerHTML = followerIds.map(followerId => {
+                    const user = users.find(u => (u.id || u.email) === followerId);
+                    if (!user) return '';
+
+                    const avatar = user.avatar || '';
+                    const name = user.name || 'Usuario';
+                    const username = user.username || name.toLowerCase().replace(/\s+/g, '');
+
+                    return `
+                        <div class="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer" onclick="viewUserProfile('${username}')">
+                            <div class="size-12 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center flex-shrink-0" style="background-image: url(${avatar}); background-size: cover; background-position: center;">
+                                ${!avatar ? '<span class="material-symbols-outlined text-gray-400">person</span>' : ''}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="font-semibold text-gray-900 truncate">${name}</p>
+                                <p class="text-sm text-gray-500 truncate">@${username}</p>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                // Mostrar modal
+                document.getElementById('followersModal').classList.remove('hidden');
+
+            } catch (error) {
+                console.error('Error cargando seguidores:', error);
+                showToast('Error al cargar seguidores', 'error');
+            }
+        }
+
+        // Mostrar lista de usuarios que sigue
+        async function showFollowing() {
+            try {
+                const userId = currentUser.id || currentUser.email;
+                const followers = await fetch(`${API_URL}/followers`).then(r => r.json());
+
+                // Obtener usernames de usuarios que sigue
+                const followingUsernames = followers
+                    .filter(f => f.followerId === userId)
+                    .map(f => f.followingUsername);
+
+                if (followingUsernames.length === 0) {
+                    showToast('Aún no sigues a nadie', 'info');
+                    return;
+                }
+
+                // Cargar información de usuarios
+                const users = await fetch(`${API_URL}/auth_users`).then(r => r.json());
+
+                // Crear lista de siguiendo
+                const followingList = document.getElementById('followingList');
+                followingList.innerHTML = followingUsernames.map(followingUsername => {
+                    const user = users.find(u => {
+                        const userIdentifier = u.username ? '@' + u.username : u.name;
+                        return userIdentifier === followingUsername || '@' + u.username === followingUsername;
+                    });
+
+                    if (!user) return '';
+
+                    const avatar = user.avatar || '';
+                    const name = user.name || 'Usuario';
+                    const username = user.username || name.toLowerCase().replace(/\s+/g, '');
+
+                    return `
+                        <div class="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer" onclick="viewUserProfile('${username}')">
+                            <div class="size-12 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center flex-shrink-0" style="background-image: url(${avatar}); background-size: cover; background-position: center;">
+                                ${!avatar ? '<span class="material-symbols-outlined text-gray-400">person</span>' : ''}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="font-semibold text-gray-900 truncate">${name}</p>
+                                <p class="text-sm text-gray-500 truncate">@${username}</p>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                // Mostrar modal
+                document.getElementById('followingModal').classList.remove('hidden');
+
+            } catch (error) {
+                console.error('Error cargando siguiendo:', error);
+                showToast('Error al cargar siguiendo', 'error');
+            }
+        }
+
+        // Cerrar modales
+        function closeFollowersModal() {
+            document.getElementById('followersModal').classList.add('hidden');
+        }
+
+        function closeFollowingModal() {
+            document.getElementById('followingModal').classList.add('hidden');
+        }
+
+        // Navegar a perfil de usuario
+        function viewUserProfile(username) {
+            window.location.href = `user-profile.html?username=${encodeURIComponent(username)}`;
+        }
+
         function viewPrompt(promptId) {
             sessionStorage.setItem('currentPromptId', promptId);
             window.location.href = 'prompt-detail.html';
@@ -486,4 +826,5 @@
         }
     </script>
 </body>
+
 </html>

@@ -1,24 +1,28 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta name="theme-color" content="#000000"/>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#000000" />
     <title>Prompt Detail - Wikiprompts</title>
-    
-    <link rel="manifest" href="/manifest.json"/>
-    <link rel="icon" type="image/png" href="/image.png"/>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans:wght@400;500;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    
+
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/png" href="/image.png" />
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans:wght@400;500;700&family=Manrope:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script id="tailwind-config">
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        "primary": "#2563EB", 
+                        "primary": "#2563EB",
                         "secondary": "#64748B",
                         "bg-page": "#FFFFFF",
                         "bg-subtle": "#F3F4F6",
@@ -28,26 +32,53 @@
                         "body": ["Manrope", "sans-serif"],
                         "mono": ["Noto Sans Mono", "monospace"],
                     },
-                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "2xl": "2rem", "full": "9999px"},
+                    borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "2xl": "2rem", "full": "9999px" },
                 },
             },
         }
     </script>
-    
+
     <style>
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
+
         .no-scrollbar {
             -ms-overflow-style: none;
             scrollbar-width: none;
+        }
+
+        /* Custom scrollbar for prompt text */
+        .overflow-y-auto::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        .overflow-y-auto::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .overflow-y-auto::-webkit-scrollbar-thumb {
+            background: #e5e7eb;
+            border-radius: 20px;
+        }
+
+        .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+
+        /* Firefox scrollbar */
+        .overflow-y-auto {
+            scrollbar-width: thin;
+            scrollbar-color: #e5e7eb transparent;
         }
     </style>
 </head>
 
 <body class="bg-bg-page text-gray-900 font-body selection:bg-gray-200 overflow-x-hidden">
     <!-- Modal de confirmación personalizado -->
-    <div id="confirmModal" class="hidden fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div id="confirmModal"
+        class="hidden fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden transform transition-all">
             <div class="p-6">
                 <div class="flex items-center gap-4 mb-4">
@@ -62,10 +93,12 @@
                     ¿Estás seguro de que quieres continuar?
                 </p>
                 <div class="flex gap-3">
-                    <button onclick="cancelConfirm()" class="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+                    <button onclick="cancelConfirm()"
+                        class="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors">
                         Cancelar
                     </button>
-                    <button onclick="acceptConfirm()" class="flex-1 px-4 py-2.5 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-colors">
+                    <button onclick="acceptConfirm()"
+                        class="flex-1 px-4 py-2.5 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-colors">
                         Eliminar
                     </button>
                 </div>
@@ -74,7 +107,8 @@
     </div>
 
     <!-- Toast de notificación -->
-    <div id="toast" class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-[10000] transform transition-all duration-300">
+    <div id="toast"
+        class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-[10000] transform transition-all duration-300">
         <div class="bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 min-w-[280px]">
             <span class="material-symbols-outlined text-[20px]">check_circle</span>
             <span id="toastMessage" class="text-sm font-medium">Acción completada</span>
@@ -82,18 +116,23 @@
     </div>
 
     <div class="relative mx-auto flex h-full min-h-screen w-full max-w-md lg:max-w-none flex-col shadow-xl bg-white">
-        
+
         <!-- Header -->
-        <header class="sticky top-0 z-50 flex items-center justify-between p-4 lg:px-12 lg:py-6 bg-white/90 backdrop-blur-md border-b border-gray-100">
-            <button onclick="goBack()" class="flex size-10 lg:size-12 items-center justify-center rounded-full text-gray-900 hover:bg-gray-100 transition-colors">
+        <header
+            class="sticky top-0 z-50 flex items-center justify-between p-4 lg:px-12 lg:py-6 bg-white/90 backdrop-blur-md border-b border-gray-100">
+            <button onclick="goBack()"
+                class="flex size-10 lg:size-12 items-center justify-center rounded-full text-gray-900 hover:bg-gray-100 transition-colors">
                 <span class="material-symbols-outlined">arrow_back</span>
             </button>
-            <h1 class="text-base lg:text-lg font-semibold font-display tracking-tight text-gray-900">Detalle del Prompt</h1>
+            <h1 class="text-base lg:text-lg font-semibold font-display tracking-tight text-gray-900">Detalle del Prompt
+            </h1>
             <div class="flex gap-2">
-                <button id="editBtn" onclick="editPrompt()" class="hidden flex size-10 lg:size-12 items-center justify-center rounded-full text-gray-900 hover:bg-gray-100 transition-colors">
+                <button id="editBtn" onclick="editPrompt()"
+                    class="hidden flex size-10 lg:size-12 items-center justify-center rounded-full text-gray-900 hover:bg-gray-100 transition-colors">
                     <span class="material-symbols-outlined">edit</span>
                 </button>
-                <button onclick="sharePrompt()" class="flex size-10 lg:size-12 items-center justify-center rounded-full text-gray-900 hover:bg-gray-100 transition-colors">
+                <button onclick="sharePrompt()"
+                    class="flex size-10 lg:size-12 items-center justify-center rounded-full text-gray-900 hover:bg-gray-100 transition-colors">
                     <span class="material-symbols-outlined">share</span>
                 </button>
             </div>
@@ -108,10 +147,12 @@
                     <div class="relative aspect-video bg-gray-50 rounded-2xl overflow-hidden shadow-lg mb-4">
                         <img id="mainImage" src="" alt="" class="w-full h-full object-cover">
                         <div class="absolute bottom-4 right-4 flex gap-2">
-                            <button onclick="fullscreenImage()" class="size-10 flex items-center justify-center rounded-full bg-white/90 shadow-sm text-gray-700 hover:text-black transition-colors backdrop-blur-sm">
+                            <button onclick="fullscreenImage()"
+                                class="size-10 flex items-center justify-center rounded-full bg-white/90 shadow-sm text-gray-700 hover:text-black transition-colors backdrop-blur-sm">
                                 <span class="material-symbols-outlined text-[20px]">fullscreen</span>
                             </button>
-                            <button onclick="downloadImage()" class="size-10 flex items-center justify-center rounded-full bg-white/90 shadow-sm text-gray-700 hover:text-black transition-colors backdrop-blur-sm">
+                            <button onclick="downloadImage()"
+                                class="size-10 flex items-center justify-center rounded-full bg-white/90 shadow-sm text-gray-700 hover:text-black transition-colors backdrop-blur-sm">
                                 <span class="material-symbols-outlined text-[20px]">download</span>
                             </button>
                         </div>
@@ -123,88 +164,115 @@
                 </div>
 
                 <div class="flex flex-col gap-8">
-                <!-- Prompt Content -->
-                <div class="flex flex-col gap-4">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-base lg:text-lg font-bold text-gray-900 uppercase tracking-wide">El Prompt</h2>
-                        <button onclick="copyPrompt()" class="group flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-900 hover:text-white rounded-lg transition-all">
-                            <span class="material-symbols-outlined text-[18px]">content_copy</span>
-                            <span>Copiar</span>
-                        </button>
+                    <!-- Prompt Content -->
+                    <div class="flex flex-col gap-4">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-base lg:text-lg font-bold text-gray-900 uppercase tracking-wide">El Prompt
+                            </h2>
+                            <button onclick="copyPrompt()"
+                                class="group flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-900 hover:text-white rounded-lg transition-all">
+                                <span class="material-symbols-outlined text-[18px]">content_copy</span>
+                                <span>Copiar</span>
+                            </button>
+                        </div>
+                        <div
+                            class="bg-gradient-to-br from-gray-50 to-gray-100 p-6 lg:p-8 rounded-2xl border border-gray-200 shadow-sm max-h-96 overflow-y-auto">
+                            <p id="promptText"
+                                class="text-gray-800 text-base lg:text-lg leading-relaxed font-mono break-words overflow-wrap-anywhere">
+                            </p>
+                        </div>
                     </div>
-                    <div class="bg-gradient-to-br from-gray-50 to-gray-100 p-6 lg:p-8 rounded-2xl border border-gray-200 shadow-sm">
-                        <p id="promptText" class="text-gray-800 text-base lg:text-lg leading-relaxed font-mono break-words overflow-wrap-anywhere"></p>
-                    </div>
-                </div>
 
-                <!-- Metadata -->
-                <div>
-                    <div id="metadata" class="flex flex-wrap items-start justify-between gap-y-4 py-4 border-t border-b border-gray-100">
-                        <!-- Se llenará dinámicamente -->
-                    </div>
-                    
-                    <!-- Actions -->
-                    <div class="flex items-center justify-start gap-6 pt-4">
-                        <button onclick="toggleLike()" id="likeBtn" class="flex items-center gap-2 text-gray-500 hover:text-red-500 transition-colors group">
-                            <span class="material-symbols-outlined group-hover:fill-current" style="font-variation-settings: 'FILL' 0;">favorite</span>
-                            <span id="likeCount" class="text-sm">0</span>
-                        </button>
-                        <button class="flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors">
-                            <span class="material-symbols-outlined">chat_bubble</span>
-                            <span id="commentCount" class="text-sm">0</span>
-                        </button>
-                        <button onclick="sharePrompt()" class="flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors ml-auto">
-                            <span class="material-symbols-outlined">ios_share</span>
-                        </button>
-                        <button onclick="toggleBookmark()" id="bookmarkBtn" class="flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors">
-                            <span class="material-symbols-outlined">bookmark</span>
-                        </button>
-                    </div>
-                </div>
+                    <!-- Metadata -->
+                    <div>
+                        <div id="metadata"
+                            class="flex flex-wrap items-start justify-between gap-y-4 py-4 border-t border-b border-gray-100">
+                            <!-- Se llenará dinámicamente -->
+                        </div>
 
-                <!-- More from Category -->
-                <div class="flex flex-col gap-4" id="relatedPromptsSection">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-lg font-bold font-display text-gray-900">Más de <span id="categoryName"></span></h3>
-                    </div>
-                    <div id="relatedPromptsGrid" class="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-8">
-                        <!-- Se cargará dinámicamente -->
-                    </div>
-                </div>
-
-                <!-- Comments Section -->
-                <div class="flex flex-col gap-4">
-                    <h3 class="text-lg font-bold font-display text-gray-900">Comentarios</h3>
-                    
-                    <!-- Add Comment Form -->
-                    <div id="addCommentSection" class="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                        <textarea 
-                            id="commentInput" 
-                            placeholder="Escribe un comentario..."
-                            rows="3"
-                            class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:border-black focus:ring-0 transition-colors text-sm resize-none"
-                        ></textarea>
-                        <div class="flex justify-end gap-2 mt-3">
-                            <button 
-                                onclick="addComment()" 
-                                class="px-5 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
-                            >
-                                Publicar
+                        <!-- Actions -->
+                        <div class="flex items-center justify-start gap-6 pt-4">
+                            <button onclick="toggleLike()" id="likeBtn"
+                                class="flex items-center gap-2 text-gray-500 hover:text-red-500 transition-colors group">
+                                <span class="material-symbols-outlined group-hover:fill-current"
+                                    style="font-variation-settings: 'FILL' 0;">favorite</span>
+                                <span id="likeCount" class="text-sm">0</span>
+                            </button>
+                            <button class="flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors">
+                                <span class="material-symbols-outlined">chat_bubble</span>
+                                <span id="commentCount" class="text-sm">0</span>
+                            </button>
+                            <button onclick="sharePrompt()"
+                                class="flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors ml-auto">
+                                <span class="material-symbols-outlined">ios_share</span>
+                            </button>
+                            <button onclick="toggleBookmark()" id="bookmarkBtn"
+                                class="flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors">
+                                <span class="material-symbols-outlined">bookmark</span>
                             </button>
                         </div>
                     </div>
-                    
-                    <div id="commentsContainer" class="flex flex-col gap-6">
-                        <!-- Se llenará dinámicamente -->
+
+                    <!-- Author Section -->
+                    <div id="authorSection"
+                        class="bg-gradient-to-br from-gray-50 to-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4 cursor-pointer" onclick="viewAuthorProfile()">
+                                <div id="authorAvatar"
+                                    class="size-12 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center flex-shrink-0">
+                                    <span class="material-symbols-outlined text-gray-400 text-2xl">person</span>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-semibold text-gray-900" id="authorName">Autor</span>
+                                    <span class="text-xs text-gray-500" id="authorUsername">@username</span>
+                                </div>
+                            </div>
+                            <button id="followBtn" onclick="toggleFollow(event)"
+                                class="hidden px-5 py-2 rounded-full text-sm font-semibold transition-all">
+                                <span id="followBtnText">Seguir</span>
+                            </button>
+                        </div>
                     </div>
-                </div>
+
+                    <!-- More from Category -->
+                    <div class="flex flex-col gap-4" id="relatedPromptsSection">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-bold font-display text-gray-900">Más de <span
+                                    id="categoryName"></span></h3>
+                        </div>
+                        <div id="relatedPromptsGrid" class="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-8">
+                            <!-- Se cargará dinámicamente -->
+                        </div>
+                    </div>
+
+                    <!-- Comments Section -->
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-lg font-bold font-display text-gray-900">Comentarios</h3>
+
+                        <!-- Add Comment Form -->
+                        <div id="addCommentSection" class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                            <textarea id="commentInput" placeholder="Escribe un comentario..." rows="3"
+                                class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:border-black focus:ring-0 transition-colors text-sm resize-none"></textarea>
+                            <div class="flex justify-end gap-2 mt-3">
+                                <button onclick="addComment()"
+                                    class="px-5 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors">
+                                    Publicar
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="commentsContainer" class="flex flex-col gap-6">
+                            <!-- Se llenará dinámicamente -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
 
         <!-- Floating Action Button -->
         <div class="fixed bottom-6 right-6 z-50">
-            <button onclick="remixPrompt()" class="flex items-center justify-center size-14 rounded-full bg-black text-white shadow-lg hover:scale-105 transition-transform hover:shadow-xl">
+            <button onclick="remixPrompt()"
+                class="flex items-center justify-center size-14 rounded-full bg-black text-white shadow-lg hover:scale-105 transition-transform hover:shadow-xl">
                 <span class="material-symbols-outlined text-[24px]">auto_fix_high</span>
             </button>
         </div>
@@ -224,22 +292,22 @@
             }
             return false;
         }
-        
+
         // Sistema de confirmación modal personalizado
         let confirmCallback = null;
-        
+
         function showConfirm(title, message, onConfirm) {
             document.getElementById('confirmTitle').textContent = title;
             document.getElementById('confirmMessage').textContent = message;
             confirmCallback = onConfirm;
             document.getElementById('confirmModal').classList.remove('hidden');
         }
-        
+
         function cancelConfirm() {
             document.getElementById('confirmModal').classList.add('hidden');
             confirmCallback = null;
         }
-        
+
         function acceptConfirm() {
             document.getElementById('confirmModal').classList.add('hidden');
             if (confirmCallback) {
@@ -267,19 +335,22 @@
         async function init() {
             try {
                 const promptId = sessionStorage.getItem('currentPromptId');
-                
+
                 if (!promptId) {
                     alert('Prompt no encontrado');
                     goBack();
                     return;
                 }
 
+                // Analytics: Registrar vista
+                fetch(`${API_URL}/analytics/prompt/${promptId}`, { method: 'POST' }).catch(console.error);
+
                 console.log('🔄 Cargando prompt del servidor...');
                 const [prompts, comments] = await Promise.all([
                     fetch(`${API_URL}/prompts`).then(r => r.json()),
                     fetch(`${API_URL}/comments`).then(r => r.json())
                 ]);
-                
+
                 const prompt = prompts.find(p => p.id === promptId);
 
                 if (!prompt) {
@@ -289,7 +360,7 @@
                 }
 
                 displayPrompt(prompt);
-                
+
                 // Filtrar comentarios de este prompt
                 const promptComments = comments.filter(c => c.promptId === promptId);
                 displayComments(promptComments);
@@ -304,16 +375,19 @@
         function displayPrompt(prompt) {
             const isAuthenticated = checkAuth();
             window.currentPrompt = prompt; // Guardar globalmente para editar
-            
-            // Mostrar botón de editar solo si el usuario es el autor
+
+            // Mostrar botón de editar solo si el usuario es el autor O ADMIN
             const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
             if (currentUser) {
                 const userIdentifier = currentUser.username ? '@' + currentUser.username : currentUser.name;
-                if (prompt.author === userIdentifier) {
+                // Verificar si es administrador
+                const isAdmin = currentUser.email === 'santyguz777@gmail.com' || currentUser.username === 'santyguz77';
+
+                if (prompt.author === userIdentifier || isAdmin) {
                     document.getElementById('editBtn').classList.remove('hidden');
                 }
             }
-            
+
             // Display images gallery if exists
             const images = prompt.images || (prompt.imageUrl ? [prompt.imageUrl] : []);
             if (images.length > 0) {
@@ -359,12 +433,15 @@
             // Display likes
             document.getElementById('likeCount').textContent = prompt.likes || 0;
             document.getElementById('commentCount').textContent = sampleComments.length;
-            
+
             // Check if bookmarked
             checkBookmarkStatus(prompt.id);
-            
+
             // Load related prompts from same category
             loadRelatedPrompts(prompt.category, prompt.id);
+
+            // Display author section
+            displayAuthorSection(prompt);
         }
 
         async function checkBookmarkStatus(promptId) {
@@ -373,7 +450,7 @@
                     fetch(`${API_URL}/bookmarks`).then(r => r.json()),
                     fetch(`${API_URL}/likes`).then(r => r.json())
                 ]);
-                
+
                 // Check bookmark - filtrar por usuario actual
                 const bookmarkBtn = document.getElementById('bookmarkBtn');
                 const bookmarkIcon = bookmarkBtn.querySelector('.material-symbols-outlined');
@@ -384,7 +461,7 @@
                         bookmarkIcon.style.fontVariationSettings = "'FILL' 1";
                     }
                 }
-                
+
                 // Check like
                 if (currentUser) {
                     const userId = currentUser.id || currentUser.email;
@@ -404,7 +481,7 @@
 
         function displayComments(comments) {
             const container = document.getElementById('commentsContainer');
-            
+
             if (comments.length === 0) {
                 container.innerHTML = `
                     <div class="text-center py-8 text-gray-400">
@@ -414,18 +491,18 @@
                 `;
                 return;
             }
-            
+
             container.innerHTML = comments.map(comment => {
                 const timeAgo = getTimeAgo(comment.createdAt);
                 const avatar = comment.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.username)}&background=random`;
-                
+
                 // Verificar si es el comentario del usuario actual
                 const isOwn = currentUser && (
                     comment.userId === (currentUser.id || currentUser.email) ||
                     comment.username === currentUser.username ||
                     comment.username === currentUser.name
                 );
-                
+
                 const deleteButton = isOwn ? `
                     <button 
                         onclick="deleteComment('${comment.id}')" 
@@ -435,7 +512,7 @@
                         <span class="material-symbols-outlined text-[18px]">delete</span>
                     </button>
                 ` : '';
-                
+
                 return `
                     <div class="flex gap-3 items-start">
                         <div class="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden">
@@ -453,7 +530,7 @@
                 `;
             }).join('');
         }
-        
+
         async function deleteComment(commentId) {
             showConfirm(
                 'Eliminar comentario',
@@ -462,19 +539,19 @@
                     try {
                         const comments = await fetch(`${API_URL}/comments`).then(r => r.json());
                         const updatedComments = comments.filter(c => c.id !== commentId);
-                        
+
                         await fetch(`${API_URL}/comments`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(updatedComments)
                         });
-                        
+
                         // Actualizar UI
                         const promptId = sessionStorage.getItem('currentPromptId');
                         const promptComments = updatedComments.filter(c => c.promptId === promptId);
                         displayComments(promptComments);
                         document.getElementById('commentCount').textContent = promptComments.length;
-                        
+
                         console.log('✅ Comentario eliminado');
                     } catch (error) {
                         console.error('❌ Error eliminando comentario:', error);
@@ -483,39 +560,39 @@
                 }
             );
         }
-        
+
         function getTimeAgo(dateString) {
             const date = new Date(dateString);
             const now = new Date();
             const seconds = Math.floor((now - date) / 1000);
-            
+
             if (seconds < 60) return 'ahora';
             if (seconds < 3600) return `hace ${Math.floor(seconds / 60)}m`;
             if (seconds < 86400) return `hace ${Math.floor(seconds / 3600)}h`;
             if (seconds < 604800) return `hace ${Math.floor(seconds / 86400)}d`;
             return date.toLocaleDateString();
         }
-        
+
         async function addComment() {
             if (!checkAuth()) {
                 alert('Debes iniciar sesión para comentar');
                 window.location.href = 'auth.html';
                 return;
             }
-            
+
             const commentInput = document.getElementById('commentInput');
             const text = commentInput.value.trim();
-            
+
             if (!text) {
                 alert('Escribe un comentario primero');
                 return;
             }
-            
+
             const promptId = sessionStorage.getItem('currentPromptId');
-            
+
             try {
                 const comments = await fetch(`${API_URL}/comments`).then(r => r.json());
-                
+
                 const newComment = {
                     id: Date.now().toString(36) + Math.random().toString(36).substr(2),
                     promptId: promptId,
@@ -525,21 +602,21 @@
                     text: text,
                     createdAt: new Date().toISOString()
                 };
-                
+
                 comments.push(newComment);
-                
+
                 await fetch(`${API_URL}/comments`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(comments)
                 });
-                
+
                 // Actualizar UI
                 commentInput.value = '';
                 const promptComments = comments.filter(c => c.promptId === promptId);
                 displayComments(promptComments);
                 document.getElementById('commentCount').textContent = promptComments.length;
-                
+
                 console.log('✅ Comentario agregado');
             } catch (error) {
                 console.error('❌ Error agregando comentario:', error);
@@ -560,15 +637,15 @@
         async function loadRelatedPrompts(category, currentPromptId) {
             try {
                 const prompts = await fetch(`${API_URL}/prompts`).then(r => r.json());
-                
+
                 // Filtrar prompts de la misma categoría, excluyendo el actual
                 const relatedPrompts = prompts
                     .filter(p => p.category === category && p.id !== currentPromptId)
                     .slice(0, 4); // Mostrar máximo 4
-                
+
                 // Actualizar el nombre de la categoría en el título
                 document.getElementById('categoryName').textContent = getCategoryLabel(category);
-                
+
                 // Renderizar prompts relacionados
                 const grid = document.getElementById('relatedPromptsGrid');
                 grid.innerHTML = relatedPrompts.map(prompt => createPromptCard(prompt)).join('');
@@ -579,7 +656,7 @@
 
         function createPromptCard(prompt) {
             const imageUrl = prompt.images?.[0] || prompt.imageUrl || '';
-            
+
             if (prompt.type === 'image') {
                 return `
                     <article class="group flex flex-col gap-3 cursor-pointer" onclick="viewPrompt('${prompt.id}')">
@@ -651,7 +728,7 @@
                 }, 1500);
                 return;
             }
-            
+
             const promptText = document.getElementById('promptText').textContent;
             navigator.clipboard.writeText(promptText).then(() => {
                 showToast('Prompt copiado al portapapeles');
@@ -667,7 +744,7 @@
             const toastMessage = document.getElementById('toastMessage');
             const icon = toast.querySelector('.material-symbols-outlined');
             const container = toast.querySelector('div');
-            
+
             // Configurar ícono y colores según el tipo
             if (type === 'success') {
                 icon.textContent = 'check_circle';
@@ -676,16 +753,16 @@
                 icon.textContent = 'error';
                 container.className = 'bg-red-500 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 min-w-[280px]';
             }
-            
+
             toastMessage.textContent = message;
-            
+
             // Mostrar con animación
             toast.classList.remove('hidden');
             setTimeout(() => {
                 toast.style.transform = 'translateX(-50%) translateY(0)';
                 toast.style.opacity = '1';
             }, 10);
-            
+
             // Ocultar después de 3 segundos
             setTimeout(() => {
                 toast.style.transform = 'translateX(-50%) translateY(-20px)';
@@ -702,26 +779,26 @@
                 window.location.href = 'auth.html';
                 return;
             }
-            
+
             const likeBtn = document.getElementById('likeBtn');
             const icon = likeBtn.querySelector('.material-symbols-outlined');
             const likeCountEl = document.getElementById('likeCount');
             const currentFill = icon.style.fontVariationSettings;
             const promptId = sessionStorage.getItem('currentPromptId');
-            
+
             try {
                 // Obtener likes y prompts actuales
                 const [likes, prompts] = await Promise.all([
                     fetch(`${API_URL}/likes`).then(r => r.json()),
                     fetch(`${API_URL}/prompts`).then(r => r.json())
                 ]);
-                
+
                 const prompt = prompts.find(p => p.id === promptId);
                 if (!prompt) return;
-                
+
                 const userId = currentUser.id || currentUser.email;
                 const existingLike = likes.find(l => l.promptId === promptId && l.userId === userId);
-                
+
                 let newLikes;
                 if (existingLike) {
                     // Unlike
@@ -743,10 +820,10 @@
                     }];
                     prompt.likes = (prompt.likes || 0) + 1;
                 }
-                
+
                 // Actualizar contador visual
                 likeCountEl.textContent = prompt.likes;
-                
+
                 // Guardar en servidor
                 await Promise.all([
                     fetch(`${API_URL}/likes`, {
@@ -760,7 +837,7 @@
                         body: JSON.stringify(prompts)
                     })
                 ]);
-                
+
                 console.log('✅ Like actualizado');
             } catch (error) {
                 console.error('❌ Error actualizando like:', error);
@@ -774,13 +851,13 @@
                 window.location.href = 'auth.html';
                 return;
             }
-            
+
             const bookmarkBtn = document.getElementById('bookmarkBtn');
             const icon = bookmarkBtn.querySelector('.material-symbols-outlined');
             const currentFill = icon.style.fontVariationSettings || "'FILL' 0";
             const promptId = sessionStorage.getItem('currentPromptId');
             const userId = currentUser.id || currentUser.email;
-            
+
             try {
                 // Obtener bookmarks o inicializar array vacío si no existe
                 let bookmarks = [];
@@ -797,7 +874,7 @@
                     console.log('Inicializando bookmarks...');
                     bookmarks = [];
                 }
-                
+
                 if (currentFill.includes("'FILL' 1")) {
                     // Remove bookmark
                     icon.style.fontVariationSettings = "'FILL' 0";
@@ -815,17 +892,17 @@
                         });
                     }
                 }
-                
+
                 const saveResponse = await fetch(`${API_URL}/bookmarks`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(bookmarks)
                 });
-                
+
                 if (!saveResponse.ok) {
                     throw new Error('Error al guardar en el servidor');
                 }
-                
+
                 console.log('✅ Bookmark actualizado');
             } catch (error) {
                 console.error('❌ Error actualizando bookmark:', error);
@@ -849,10 +926,10 @@
         function remixPrompt() {
             window.location.href = 'contribute.html';
         }
-        
+
         function editPrompt() {
             if (!window.currentPrompt) return;
-            
+
             // Guardar el prompt actual para edición
             sessionStorage.setItem('editingPrompt', JSON.stringify(window.currentPrompt));
             window.location.href = 'contribute.html?edit=true';
@@ -863,13 +940,13 @@
             const gallery = document.getElementById('imageGallery');
             const mainImage = document.getElementById('mainImage');
             const thumbnailsContainer = document.getElementById('thumbnailsContainer');
-            
+
             gallery.classList.remove('hidden');
-            
+
             // Establecer primera imagen como principal
             mainImage.src = images[0];
             mainImage.alt = window.currentPrompt?.title || 'Imagen';
-            
+
             // Si hay más de una imagen, mostrar miniaturas
             if (images.length > 1) {
                 thumbnailsContainer.innerHTML = images.map((img, index) => `
@@ -887,10 +964,10 @@
         }
 
         // Cambiar imagen principal
-        window.changeMainImage = function(imageUrl, index) {
+        window.changeMainImage = function (imageUrl, index) {
             const mainImage = document.getElementById('mainImage');
             mainImage.src = imageUrl;
-            
+
             // Actualizar bordes de miniaturas
             const allThumbnails = document.querySelectorAll('[id^="thumbnail-"]');
             allThumbnails.forEach((thumb, i) => {
@@ -916,16 +993,16 @@
                 showToast('No hay imagen para descargar', true);
                 return;
             }
-            
+
             // Obtener la imagen actualmente mostrada
             const mainImage = document.getElementById('mainImage');
             const imageUrl = mainImage ? mainImage.src : (window.currentPrompt.images?.[0] || window.currentPrompt.imageUrl);
-            
+
             if (!imageUrl) {
                 showToast('No hay imagen para descargar', true);
                 return;
             }
-            
+
             try {
                 // Si la imagen es base64, descargar directamente
                 if (imageUrl.startsWith('data:')) {
@@ -958,6 +1035,196 @@
             }
         }
 
+        // Mostrar sección del autor
+        async function displayAuthorSection(prompt) {
+            const authorName = document.getElementById('authorName');
+            const authorUsername = document.getElementById('authorUsername');
+            const authorAvatar = document.getElementById('authorAvatar');
+            const followBtn = document.getElementById('followBtn');
+
+            // Extraer información del autor del prompt
+            const author = prompt.author;
+
+            // Mostrar nombre y username
+            if (author.startsWith('@')) {
+                authorUsername.textContent = author;
+                authorName.textContent = author.substring(1);
+            } else {
+                authorName.textContent = author;
+                authorUsername.textContent = '@' + author.toLowerCase().replace(/\s+/g, '');
+            }
+
+            // Cargar avatar del autor desde la base de datos de usuarios
+            try {
+                const response = await fetch(`${API_URL}/auth_users`);
+                console.log('📡 Response status:', response.status);
+
+                if (!response.ok) {
+                    console.error('❌ Error en respuesta:', response.status, response.statusText);
+                    return;
+                }
+
+                const users = await response.json();
+                console.log('👥 Datos recibidos:', users);
+                console.log('👥 Es array?:', Array.isArray(users));
+                console.log('🔍 Buscando autor:', author);
+
+                // Verificar que users sea un array
+                if (!Array.isArray(users)) {
+                    console.error('❌ users no es un array, es:', typeof users);
+                    return;
+                }
+
+                // Buscar usuario por username o nombre (más flexible)
+                const authorUser = users.find(u => {
+                    // Normalizar para comparación
+                    const promptAuthor = author.toLowerCase().replace('@', '');
+                    const userName = (u.name || '').toLowerCase();
+                    const userUsername = (u.username || '').toLowerCase();
+
+                    return userName === promptAuthor ||
+                        userUsername === promptAuthor ||
+                        userName.replace(/\s+/g, '') === promptAuthor ||
+                        author === u.name ||
+                        author === '@' + u.username;
+                });
+
+                console.log('✅ Usuario encontrado:', authorUser);
+
+                if (authorUser && authorUser.avatar) {
+                    console.log('🖼️ Mostrando avatar');
+                    authorAvatar.style.backgroundImage = `url(${authorUser.avatar})`;
+                    authorAvatar.style.backgroundSize = 'cover';
+                    authorAvatar.style.backgroundPosition = 'center';
+                    authorAvatar.innerHTML = '';
+                } else {
+                    console.log('⚠️ No se encontró avatar');
+                }
+
+                // Guardar info del autor para navegación
+                window.authorUserData = authorUser;
+
+            } catch (error) {
+                console.error('❌ Error cargando avatar:', error);
+            }
+
+            // Mostrar botón de seguir solo si NO es el autor actual
+            if (currentUser) {
+                const userIdentifier = currentUser.username ? '@' + currentUser.username : currentUser.name;
+                if (prompt.author !== userIdentifier) {
+                    followBtn.classList.remove('hidden');
+                    await checkFollowStatus(prompt.author);
+                }
+            }
+        }
+
+        // Verificar si ya sigue al autor
+        async function checkFollowStatus(authorIdentifier) {
+            if (!currentUser) return;
+
+            try {
+                const followers = await fetch(`${API_URL}/followers`).then(r => r.json());
+                const userId = currentUser.id || currentUser.email;
+
+                // Buscar si ya sigue a este autor
+                // Nota: Necesitamos el ID del autor, no solo el nombre
+                // Por ahora usamos el identificador como referencia
+                const isFollowing = followers.some(f =>
+                    f.followerId === userId && f.followingUsername === authorIdentifier
+                );
+
+                updateFollowButton(isFollowing);
+            } catch (error) {
+                console.error('Error verificando follow status:', error);
+            }
+        }
+
+        // Actualizar apariencia del botón de seguir
+        function updateFollowButton(isFollowing) {
+            const followBtn = document.getElementById('followBtn');
+            const followBtnText = document.getElementById('followBtnText');
+
+            if (isFollowing) {
+                followBtn.className = 'px-5 py-2 rounded-full text-sm font-semibold transition-all bg-gray-200 text-gray-700 hover:bg-gray-300';
+                followBtnText.textContent = 'Siguiendo';
+            } else {
+                followBtn.className = 'px-5 py-2 rounded-full text-sm font-semibold transition-all bg-black text-white hover:bg-gray-800';
+                followBtnText.textContent = 'Seguir';
+            }
+        }
+
+        // Toggle seguir/dejar de seguir
+        async function toggleFollow(event) {
+            event.stopPropagation();
+
+            if (!checkAuth()) {
+                alert('Debes iniciar sesión para seguir usuarios');
+                window.location.href = 'auth.html';
+                return;
+            }
+
+            const followBtnText = document.getElementById('followBtnText');
+            const isFollowing = followBtnText.textContent === 'Siguiendo';
+            const authorUsername = document.getElementById('authorUsername').textContent;
+
+            try {
+                const followers = await fetch(`${API_URL}/followers`).then(r => r.json());
+                const userId = currentUser.id || currentUser.email;
+
+                let newFollowers;
+                if (isFollowing) {
+                    // Dejar de seguir
+                    newFollowers = followers.filter(f =>
+                        !(f.followerId === userId && f.followingUsername === authorUsername)
+                    );
+                    showToast('Dejaste de seguir a este usuario');
+                } else {
+                    // Seguir
+                    const newFollow = {
+                        id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+                        followerId: userId,
+                        followingUsername: authorUsername,
+                        createdAt: new Date().toISOString()
+                    };
+                    newFollowers = [...followers, newFollow];
+                    showToast('Ahora sigues a este usuario');
+                }
+
+                // Guardar en servidor usando PUT para operación atómica
+                await fetch(`${API_URL}/followers`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newFollowers)
+                });
+
+                // Actualizar UI
+                updateFollowButton(!isFollowing);
+
+            } catch (error) {
+                console.error('Error al seguir/dejar de seguir:', error);
+                showToast('Error al actualizar. Intenta de nuevo.', 'error');
+            }
+        }
+
+        // Ver perfil del autor
+        function viewAuthorProfile() {
+            const authorUsername = document.getElementById('authorUsername').textContent;
+
+            // Si es el usuario actual, ir a su perfil
+            if (currentUser) {
+                const userIdentifier = currentUser.username ? '@' + currentUser.username : '@' + currentUser.name.toLowerCase().replace(/\s+/g, '');
+
+                if (authorUsername === userIdentifier) {
+                    window.location.href = 'profile.html';
+                    return;
+                }
+            }
+
+            // Si es otro usuario, ir a su perfil público
+            const username = authorUsername.replace('@', '');
+            window.location.href = `user-profile.html?username=${encodeURIComponent(username)}`;
+        }
+
         // Initialize on load
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', init);
@@ -966,4 +1233,5 @@
         }
     </script>
 </body>
+
 </html>

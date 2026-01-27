@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inicializar Datos - Wikiprompts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 p-8">
+    <div class="max-w-2xl mx-auto">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <h1 class="text-3xl font-bold mb-4">🔧 Inicializar Datos de Ejemplo</h1>
+
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-yellow-700">
+                            <strong>Advertencia:</strong> Este script solo funciona si la base de datos está vacía.
+                            Si ya tienes datos, no se borrarán.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4 mb-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">URL del Servidor:</label>
+                    <input type="text" id="apiUrl" value="https://sentences-col-vice-antivirus.trycloudflare.com/api"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Número de prompts de ejemplo:</label>
+                    <input type="number" id="promptCount" value="6" min="1" max="20"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                </div>
+            </div>
+
+            <button onclick="initializeData()"
+                class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                Inicializar Datos de Ejemplo
+            </button>
+
+            <div id="status" class="mt-6 hidden">
+                <div class="bg-gray-100 rounded-lg p-4">
+                    <h3 class="font-semibold mb-2">Estado:</h3>
+                    <pre id="statusText" class="text-sm text-gray-700 whitespace-pre-wrap"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const samplePrompts = [
+            {
+                id: 'prompt-1',
+                title: 'Neo-Tokyo',
+                category: 'visuals',
+                type: 'image',
+                model: 'MJ v5',
+                prompt: 'A futuristic cyberpunk city at night, neon lights reflecting on wet streets, rain, dramatic lighting --ar 16:9 --v 5',
+                imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBGy8KzzzYhhbIReoYQqGLw4bqJVTHEg2WGC_CHAuaehAV9u95O9W6UoDxHbAGPPSv6fV10hYUccrFUWmrVdIlBYfdyrrjNAcGtcPSgIL-8m2WzbqGDBKSlJ7IjDHwxEb8u9YyybSHH_BCSp94WOpIC8Wh1Z45-6PoQzvX7TnzpysoHtvjm_3BYBb6_umrHNQbCPss_oQAlvJEfqcVhC-qMXfqk5gKJpLgApHLlXGAbtSIRt8L0O3tVSKuuhZ4IrdbTY4-gUwxhZLUh',
+                likes: 2400,
+                author: 'User1',
+                createdAt: new Date('2024-01-15').toISOString()
+            },
+            {
+                id: 'prompt-2',
+                title: 'SEO Master',
+                category: 'marketing',
+                type: 'text',
+                model: 'GPT-4',
+                prompt: 'Act as an SEO expert. Write a comprehensive guide on modern link building strategies focusing on quality over quantity...',
+                likes: 1850,
+                author: 'User2',
+                createdAt: new Date('2024-01-14').toISOString()
+            },
+            {
+                id: 'prompt-3',
+                title: 'Fluid Abstract',
+                category: 'visuals',
+                type: 'image',
+                model: 'SDXL',
+                prompt: 'Abstract fluid art, organic shapes, pastel colors, dreamy atmosphere, high resolution --ar 3:4',
+                imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD0WUQ2s2klMUngXNSpPd6VfN9tCb_yTJyVyRRXuHkBVDvpbDeQJSScStW8N1hZpxCW7tiT3-dZIlYMz3eQ5EDL0QznrCvfZnPAYYIsJSPGvc27tmBLY92MVqEuQUOyUuP5atCg6R0Frv1uXemieAR6u6KF0dsmpRHTAffyhxOKg8P6J_AFBsUccdslGlurw1pLZTRK35kFUbxePcYADYAGUeVnuFylI89ukldKQsBLU_u5vBbwyudNeEk4GjjxHIzg91sIVCNvjLUq',
+                likes: 1620,
+                author: 'User3',
+                createdAt: new Date('2024-01-13').toISOString()
+            },
+            {
+                id: 'prompt-4',
+                title: 'Data Scraper',
+                category: 'coding',
+                type: 'code',
+                model: 'Python',
+                prompt: 'Create a Python script to scrape product data from e-commerce websites using Beautiful Soup and Selenium',
+                codePreview: 'def scrape(url):\n  res = get(url)\n  return res.text',
+                likes: 980,
+                author: 'User4',
+                createdAt: new Date('2024-01-12').toISOString()
+            },
+            {
+                id: 'prompt-5',
+                title: 'Minimal Arch',
+                category: 'visuals',
+                type: 'image',
+                model: 'MJ v5',
+                prompt: 'Minimalist architecture, white walls, natural light, clean lines, modern interior design --ar 4:5',
+                imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBcLwf2D8zb3GT0X5d4r6s8Ttzhez9UoqjqsKPe0QzDNr-rxJG4aY_PEsCk-btxsp5DYpnL0QUDnmGYeFbh8b0dM6KHlB-97Y9H4cqSCsnVCnZL2TUkoIt6QRzphLw3JOcIxglI_aYgyiAkoYKMZ5EDCjulWWUNrnPIxGpagGkIggTWzUiSLpr3Ce6ec5Co8gnH-0fB1PLxuLvAaqbkzMNd_8a5We2fB9Iwzo86mYNQU5vU6cM_tn5InjDxtE2D_BQSjCX_b7lU-6Kr',
+                likes: 1340,
+                author: 'User5',
+                createdAt: new Date('2024-01-11').toISOString()
+            },
+            {
+                id: 'prompt-6',
+                title: 'Blog Post Writer',
+                category: 'writing',
+                type: 'text',
+                model: 'Claude',
+                prompt: 'Write a comprehensive 2000-word blog post about sustainable living practices. Include statistics, practical tips, and engaging storytelling.',
+                likes: 756,
+                author: 'User6',
+                createdAt: new Date('2024-01-10').toISOString()
+            }
+        ];
+
+        function showStatus(message, isError = false) {
+            const statusDiv = document.getElementById('status');
+            const statusText = document.getElementById('statusText');
+            statusDiv.classList.remove('hidden');
+
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = isError ? '❌' : '✅';
+            statusText.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            statusText.scrollTop = statusText.scrollHeight;
+        }
+
+        async function initializeData() {
+            const apiUrl = document.getElementById('apiUrl').value;
+            const promptCount = parseInt(document.getElementById('promptCount').value);
+
+            // Limpiar estado anterior
+            document.getElementById('statusText').textContent = '';
+
+            showStatus('Iniciando proceso de inicialización...');
+
+            try {
+                // Verificar conexión con el servidor
+                showStatus('Verificando conexión con el servidor...');
+                const testResponse = await fetch(`${apiUrl}/prompts`);
+                if (!testResponse.ok) {
+                    throw new Error(`Error al conectar: ${testResponse.status}`);
+                }
+
+                const existingPrompts = await testResponse.json();
+                showStatus(`Prompts existentes en el servidor: ${existingPrompts.length}`);
+
+                if (existingPrompts.length > 0) {
+                    showStatus(`⚠️ La base de datos ya tiene ${existingPrompts.length} prompts.`, true);
+                    showStatus('No se inicializará para evitar borrar datos existentes.', true);
+                    return;
+                }
+
+                // Preparar datos de ejemplo
+                const promptsToInit = samplePrompts.slice(0, promptCount);
+                showStatus(`Preparando ${promptsToInit.length} prompts de ejemplo...`);
+
+                // Usar el endpoint seguro de inicialización
+                showStatus('Enviando datos al servidor...');
+                const initResponse = await fetch(`${apiUrl}/prompts/initialize`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(promptsToInit)
+                });
+
+                const result = await initResponse.json();
+
+                if (initResponse.ok) {
+                    showStatus(`✅ ¡Éxito! Se inicializaron ${result.count} prompts correctamente.`);
+                    showStatus('Puedes cerrar esta ventana y recargar la aplicación.');
+                } else {
+                    throw new Error(result.error || 'Error desconocido');
+                }
+
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, true);
+                console.error('Error completo:', error);
+            }
+        }
+    </script>
+</body>
+
+</html>

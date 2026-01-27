@@ -10,8 +10,26 @@ const AppState = {
     categories: [],
     currentUser: null,
     currentCategory: 'all',
-    searchQuery: ''
+    searchQuery: '',
+    searchQuery: '',
+    currentPage: 1,
+    itemsPerPage: 60
 };
+
+// CONFIGURACIÓN DE PUBLICIDAD (ADSENSE)
+const GOOGLE_AD_CODE = `
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5747426531124165"
+     crossorigin="anonymous"></script>
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-format="fluid"
+     data-ad-layout-key="-6t+ed+2i-1n-4w"
+     data-ad-client="ca-pub-5747426531124165"
+     data-ad-slot="3534077285"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+`;
 
 // Verificar autenticación al cargar
 async function checkAuth() {
@@ -35,10 +53,10 @@ function requireAuth() {
 // Función para verificar si el usuario es administrador
 function isAdmin() {
     if (!AppState.currentUser) return false;
-    
+
     // Verificar si es el administrador
-    return AppState.currentUser.email === 'santyguz777@gmail.com' || 
-           AppState.currentUser.username === 'santyguz77';
+    return AppState.currentUser.email === 'santyguz777@gmail.com' ||
+        AppState.currentUser.username === 'santyguz77';
 }
 
 // Función para cerrar sesión
@@ -82,7 +100,7 @@ const API = {
             return [];
         }
     },
-    
+
     async save(table, items) {
         try {
             const response = await fetch(`${API_URL}/${table}`, {
@@ -97,7 +115,7 @@ const API = {
             throw error;
         }
     },
-    
+
     async update(table, id, item) {
         try {
             const response = await fetch(`${API_URL}/${table}/${id}`, {
@@ -119,7 +137,7 @@ const Utils = {
     generateId() {
         return Date.now().toString(36) + Math.random().toString(36).substr(2);
     },
-    
+
     formatDate(date) {
         return new Intl.DateTimeFormat('es-ES', {
             year: 'numeric',
@@ -127,95 +145,29 @@ const Utils = {
             day: 'numeric'
         }).format(new Date(date));
     },
-    
+
     truncateText(text, maxLength) {
         if (text.length <= maxLength) return text;
         return text.substring(0, maxLength) + '...';
     }
 };
 
-// Datos de ejemplo para la demostración
-const samplePrompts = [
-    {
-        id: 'prompt-1',
-        title: 'Neo-Tokyo',
-        category: 'visuals',
-        type: 'image',
-        model: 'MJ v5',
-        prompt: 'A futuristic cyberpunk city at night, neon lights reflecting on wet streets, rain, dramatic lighting --ar 16:9 --v 5',
-        imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBGy8KzzzYhhbIReoYQqGLw4bqJVTHEg2WGC_CHAuaehAV9u95O9W6UoDxHbAGPPSv6fV10hYUccrFUWmrVdIlBYfdyrrjNAcGtcPSgIL-8m2WzbqGDBKSlJ7IjDHwxEb8u9YyybSHH_BCSp94WOpIC8Wh1Z45-6PoQzvX7TnzpysoHtvjm_3BYBb6_umrHNQbCPss_oQAlvJEfqcVhC-qMXfqk5gKJpLgApHLlXGAbtSIRt8L0O3tVSKuuhZ4IrdbTY4-gUwxhZLUh',
-        likes: 2400,
-        author: 'User1',
-        createdAt: new Date('2024-01-15').toISOString()
-    },
-    {
-        id: 'prompt-2',
-        title: 'SEO Master',
-        category: 'marketing',
-        type: 'text',
-        model: 'GPT-4',
-        prompt: 'Act as an SEO expert. Write a comprehensive guide on modern link building strategies focusing on quality over quantity...',
-        likes: 1850,
-        author: 'User2',
-        createdAt: new Date('2024-01-14').toISOString()
-    },
-    {
-        id: 'prompt-3',
-        title: 'Fluid Abstract',
-        category: 'visuals',
-        type: 'image',
-        model: 'SDXL',
-        prompt: 'Abstract fluid art, organic shapes, pastel colors, dreamy atmosphere, high resolution --ar 3:4',
-        imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD0WUQ2s2klMUngXNSpPd6VfN9tCb_yTJyVyRRXuHkBVDvpbDeQJSScStW8N1hZpxCW7tiT3-dZIlYMz3eQ5EDL0QznrCvfZnPAYYIsJSPGvc27tmBLY92MVqEuQUOyUuP5atCg6R0Frv1uXemieAR6u6KF0dsmpRHTAffyhxOKg8P6J_AFBsUccdslGlurw1pLZTRK35kFUbxePcYADYAGUeVnuFylI89ukldKQsBLU_u5vBbwyudNeEk4GjjxHIzg91sIVCNvjLUq',
-        likes: 1620,
-        author: 'User3',
-        createdAt: new Date('2024-01-13').toISOString()
-    },
-    {
-        id: 'prompt-4',
-        title: 'Data Scraper',
-        category: 'coding',
-        type: 'code',
-        model: 'Python',
-        prompt: 'Create a Python script to scrape product data from e-commerce websites using Beautiful Soup and Selenium',
-        codePreview: 'def scrape(url):\n  res = get(url)\n  return res.text',
-        likes: 980,
-        author: 'User4',
-        createdAt: new Date('2024-01-12').toISOString()
-    },
-    {
-        id: 'prompt-5',
-        title: 'Minimal Arch',
-        category: 'visuals',
-        type: 'image',
-        model: 'MJ v5',
-        prompt: 'Minimalist architecture, white walls, natural light, clean lines, modern interior design --ar 4:5',
-        imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBcLwf2D8zb3GT0X5d4r6s8Ttzhez9UoqjqsKPe0QzDNr-rxJG4aY_PEsCk-btxsp5DYpnL0QUDnmGYeFbh8b0dM6KHlB-97Y9H4cqSCsnVCnZL2TUkoIt6QRzphLw3JOcIxglI_aYgyiAkoYKMZ5EDCjulWWUNrnPIxGpagGkIggTWzUiSLpr3Ce6ec5Co8gnH-0fB1PLxuLvAaqbkzMNd_8a5We2fB9Iwzo86mYNQU5vU6cM_tn5InjDxtE2D_BQSjCX_b7lU-6Kr',
-        likes: 1340,
-        author: 'User5',
-        createdAt: new Date('2024-01-11').toISOString()
-    },
-    {
-        id: 'prompt-6',
-        title: 'Blog Post Writer',
-        category: 'writing',
-        type: 'text',
-        model: 'Claude',
-        prompt: 'Write a comprehensive 2000-word blog post about sustainable living practices. Include statistics, practical tips, and engaging storytelling.',
-        likes: 756,
-        author: 'User6',
-        createdAt: new Date('2024-01-10').toISOString()
-    }
-];
-
 // Inicializar la aplicación
 async function init() {
+    // Analytics: Registrar visita (una vez por sesión)
+    if (!sessionStorage.getItem('visitRecorded')) {
+        fetch(`${API_URL}/analytics/visit`, { method: 'POST' })
+            .then(() => console.log('📊 Visita registrada'))
+            .catch(console.error);
+        sessionStorage.setItem('visitRecorded', 'true');
+    }
+
     // Verificar autenticación
     await checkAuth();
-    
+
     try {
         console.log('🔄 Cargando datos del servidor...');
-        
+
         // Cargar datos del servidor
         const [prompts, categories, likes, bookmarks] = await Promise.all([
             API.getAll('prompts'),
@@ -223,34 +175,25 @@ async function init() {
             API.getAll('likes'),
             API.getAll('bookmarks')
         ]);
-        
+
         console.log(`✅ Cargados ${prompts.length} prompts del servidor`);
-        
-        // Si no hay datos en el servidor, usar datos de ejemplo
-        if (prompts.length === 0) {
-            console.log('📝 Inicializando datos de ejemplo en el servidor...');
-            AppState.prompts = samplePrompts;
-            await API.save('prompts', samplePrompts);
-            console.log('✅ Datos de ejemplo guardados en el servidor');
-        } else {
-            AppState.prompts = prompts;
-        }
-        
+
+        AppState.prompts = prompts;
         AppState.categories = categories;
         AppState.likes = likes;
-        
+
     } catch (error) {
         console.error('❌ Error conectando con el servidor:', error);
-        alert('No se pudo conectar con el servidor. Por favor verifica que esté en ejecución.');
+        // No mostrar alerta intrusiva si falla silenciosamente
         AppState.prompts = [];
     }
-    
+
     // Actualizar UI con usuario actual
     updateUserUI();
-    
+
     // Renderizar prompts
     renderPrompts();
-    
+
     // Configurar event listeners
     setupEventListeners();
 }
@@ -259,7 +202,7 @@ async function init() {
 function updateUserUI() {
     const profileBtn = document.getElementById('profileBtn');
     const loginBtn = document.getElementById('loginBtn');
-    
+
     if (AppState.currentUser) {
         // Usuario autenticado
         if (profileBtn) {
@@ -293,10 +236,11 @@ function setupEventListeners() {
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
             AppState.searchQuery = e.target.value.toLowerCase();
+            AppState.currentPage = 1; // Resetear paginación
             renderPrompts();
         });
     }
-    
+
     // Filtros de categoría
     const categoryButtons = document.querySelectorAll('.category-btn');
     categoryButtons.forEach(btn => {
@@ -304,17 +248,18 @@ function setupEventListeners() {
             // Remover clase active de todos
             categoryButtons.forEach(b => b.classList.remove('active', 'bg-black', 'text-white'));
             categoryButtons.forEach(b => b.classList.add('bg-white', 'text-gray-500'));
-            
+
             // Agregar clase active al botón clickeado
             btn.classList.remove('bg-white', 'text-gray-500');
             btn.classList.add('active', 'bg-black', 'text-white');
-            
+
             // Actualizar categoría actual
             AppState.currentCategory = btn.dataset.category;
+            AppState.currentPage = 1; // Resetear paginación
             renderPrompts();
         });
     });
-    
+
     // Botón de agregar prompt
     const addPromptBtn = document.getElementById('addPromptBtn');
     if (addPromptBtn) {
@@ -322,63 +267,63 @@ function setupEventListeners() {
             window.location.href = 'contribute.html';
         });
     }
-    
+
     // Navegación inferior
     const navHome = document.getElementById('navHome');
     const navExplore = document.getElementById('navExplore');
     const navBookmarks = document.getElementById('navBookmarks');
     const navProfile = document.getElementById('navProfile');
     const profileBtn = document.getElementById('profileBtn');
-    
+
     // Desktop navigation buttons
     const navHomeDesktop = document.getElementById('navHomeDesktop');
     const navExploreDesktop = document.getElementById('navExploreDesktop');
     const navBookmarksDesktop = document.getElementById('navBookmarksDesktop');
-    
+
     // Mobile navigation
     if (navHome) {
         navHome.addEventListener('click', () => {
             window.location.href = 'index.html';
         });
     }
-    
+
     if (navExplore) {
         navExplore.addEventListener('click', () => {
             window.location.href = 'explore.html';
         });
     }
-    
+
     if (navBookmarks) {
         navBookmarks.addEventListener('click', () => {
             window.location.href = 'bookmarks.html';
         });
     }
-    
+
     if (navProfile) {
         navProfile.addEventListener('click', () => {
             window.location.href = 'profile.html';
         });
     }
-    
+
     // Desktop navigation
     if (navHomeDesktop) {
         navHomeDesktop.addEventListener('click', () => {
             window.location.href = 'index.html';
         });
     }
-    
+
     if (navExploreDesktop) {
         navExploreDesktop.addEventListener('click', () => {
             window.location.href = 'explore.html';
         });
     }
-    
+
     if (navBookmarksDesktop) {
         navBookmarksDesktop.addEventListener('click', () => {
             window.location.href = 'bookmarks.html';
         });
     }
-    
+
     if (profileBtn) {
         profileBtn.addEventListener('click', () => {
             window.location.href = 'profile.html';
@@ -389,28 +334,139 @@ function setupEventListeners() {
 // Renderizar prompts
 function renderPrompts() {
     const grid = document.getElementById('promptsGrid');
+    const paginationContainer = document.getElementById('pagination');
     if (!grid) return;
-    
+
     // Filtrar prompts
     let filteredPrompts = AppState.prompts;
-    
+
     // Filtrar por categoría
     if (AppState.currentCategory !== 'all') {
         filteredPrompts = filteredPrompts.filter(p => p.category === AppState.currentCategory);
     }
-    
+
     // Filtrar por búsqueda
     if (AppState.searchQuery) {
-        filteredPrompts = filteredPrompts.filter(p => 
+        filteredPrompts = filteredPrompts.filter(p =>
             p.title.toLowerCase().includes(AppState.searchQuery) ||
             p.prompt.toLowerCase().includes(AppState.searchQuery) ||
             p.category.toLowerCase().includes(AppState.searchQuery)
         );
     }
-    
-    // Renderizar
-    grid.innerHTML = filteredPrompts.map(prompt => createPromptCard(prompt)).join('') + createAddCard();
+
+    // Paginación
+    const totalItems = filteredPrompts.length;
+    const totalPages = Math.ceil(totalItems / AppState.itemsPerPage);
+
+    // Asegurar que la página actual es válida
+    if (AppState.currentPage > totalPages) AppState.currentPage = 1;
+    if (AppState.currentPage < 1) AppState.currentPage = 1;
+
+    const startIndex = (AppState.currentPage - 1) * AppState.itemsPerPage;
+    const endIndex = startIndex + AppState.itemsPerPage;
+    const paginatedPrompts = filteredPrompts.slice(startIndex, endIndex);
+
+    // Renderizar Grid con anuncios intercalados
+    let gridHTML = '';
+    paginatedPrompts.forEach((prompt, index) => {
+        gridHTML += createPromptCard(prompt);
+        // Insertar anuncio cada 6 items
+        if ((index + 1) % 6 === 0) {
+            gridHTML += createAdCard();
+        }
+    });
+
+    // Agregar tarjeta de "Agregar" solo al final de la última página
+    if (AppState.currentPage === totalPages || totalPages === 0) {
+        gridHTML += createAddCard();
+    }
+
+    grid.innerHTML = gridHTML;
+
+    // Renderizar Paginación
+    renderPagination(paginationContainer, totalPages);
 }
+
+// Crear tarjeta de anuncio (Publicidad)
+function createAdCard() {
+    return `
+        <article class="group flex flex-col gap-3 cursor-default">
+            <div class="relative aspect-[3/4] rounded-2xl bg-gray-50 border border-gray-100 flex flex-col items-center justify-center overflow-hidden">
+                <span class="absolute top-3 right-3 text-[10px] font-bold text-gray-300 uppercase tracking-widest bg-white px-1.5 py-0.5 rounded shadow-sm z-10">Ad</span>
+                <!-- Google AdSense Container -->
+                <div class="w-full h-full flex items-center justify-center text-gray-300 text-xs text-center px-4 overflow-hidden relative">
+                     ${GOOGLE_AD_CODE}
+                </div>
+            </div>
+            <div class="flex flex-col gap-0.5 px-1 opacity-60">
+                <h3 class="font-display font-semibold text-[15px] leading-tight text-gray-400">Patrocinado</h3>
+                <p class="text-[11px] font-medium text-gray-300">Google Ads</p>
+            </div>
+        </article>
+    `;
+}
+
+// Renderizar controles de paginación
+function renderPagination(container, totalPages) {
+    if (!container) return;
+    if (totalPages <= 1) {
+        container.innerHTML = '';
+        return;
+    }
+
+    let html = '';
+
+    // Botón Anterior
+    if (AppState.currentPage > 1) {
+        html += `<button onclick="changePage(${AppState.currentPage - 1})" class="size-10 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-600 hover:bg-black hover:text-white hover:border-black transition-colors">
+            <span class="material-symbols-outlined text-[20px]">chevron_left</span>
+        </button>`;
+    }
+
+    // Números de página
+    // Mostrar rango inteligente: 1 ... 4 5 [6] 7 8 ... 20
+    const maxVisible = 5;
+    let startPage = Math.max(1, AppState.currentPage - 2);
+    let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+    if (endPage - startPage < maxVisible - 1) {
+        startPage = Math.max(1, endPage - maxVisible + 1);
+    }
+
+    if (startPage > 1) {
+        html += `<button onclick="changePage(1)" class="size-10 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-600 hover:bg-black hover:text-white hover:border-black transition-colors text-sm font-medium">1</button>`;
+        if (startPage > 2) html += `<span class="px-1 text-gray-400">...</span>`;
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+        const isActive = i === AppState.currentPage;
+        html += `<button onclick="changePage(${i})" class="size-10 flex items-center justify-center rounded-full border transition-colors text-sm font-medium ${isActive ? 'bg-black border-black text-white' : 'bg-white border-gray-200 text-gray-600 hover:bg-black hover:text-white hover:border-black'}">
+            ${i}
+        </button>`;
+    }
+
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) html += `<span class="px-1 text-gray-400">...</span>`;
+        html += `<button onclick="changePage(${totalPages})" class="size-10 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-600 hover:bg-black hover:text-white hover:border-black transition-colors text-sm font-medium">${totalPages}</button>`;
+    }
+
+    // Botón Siguiente
+    if (AppState.currentPage < totalPages) {
+        html += `<button onclick="changePage(${AppState.currentPage + 1})" class="size-10 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-600 hover:bg-black hover:text-white hover:border-black transition-colors">
+            <span class="material-symbols-outlined text-[20px]">chevron_right</span>
+        </button>`;
+    }
+
+    container.innerHTML = html;
+}
+
+// Función global para cambiar página
+window.changePage = function (page) {
+    AppState.currentPage = page;
+    renderPrompts();
+    // Scroll suave hacia arriba
+    document.getElementById('promptsGrid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
 
 // Crear tarjeta de prompt
 function createPromptCard(prompt) {
@@ -441,8 +497,8 @@ function createPromptCard(prompt) {
                     <div class="flex justify-between items-start">
                         <div class="w-2 h-2 rounded-full bg-black"></div>
                     </div>
-                    <p class="font-body text-[11px] leading-relaxed text-gray-500 line-clamp-6">
-                        <span class="font-semibold text-black">Prompt:</span> ${Utils.truncateText(prompt.prompt, 150)}
+                    <p class="font-body text-xs leading-relaxed text-gray-600 line-clamp-[8] overflow-hidden">
+                        ${Utils.truncateText(prompt.prompt, 180)}
                     </p>
                     <div class="bg-gray-50 px-2 py-1 rounded-md self-start border border-gray-100">
                         <span class="text-[9px] font-bold uppercase tracking-wider text-gray-400">${prompt.model}</span>
@@ -455,6 +511,15 @@ function createPromptCard(prompt) {
             </article>
         `;
     } else if (prompt.type === 'code') {
+        // Determinar qué contenido mostrar: codePreview o un snippet del prompt
+        let contentPreview = '';
+        if (prompt.codePreview) {
+            contentPreview = prompt.codePreview.split('\n').slice(0, 6).map(line => `<div>${line}</div>`).join('');
+        } else {
+            // Fallback al prompt si no hay preview de código, simulando código
+            contentPreview = `<div class="whitespace-pre-wrap font-sans text-gray-400 opacity-80">${Utils.truncateText(prompt.prompt, 120)}</div>`;
+        }
+
         return `
             <article class="group flex flex-col gap-3 cursor-pointer" onclick="viewPrompt('${prompt.id}')">
                 <div class="relative aspect-[3/4] rounded-2xl bg-gray-900 p-5 flex flex-col overflow-hidden shadow-lg shadow-gray-200">
@@ -462,13 +527,11 @@ function createPromptCard(prompt) {
                         <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
                         <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
                     </div>
-                    <div class="font-mono text-[10px] text-gray-400 leading-relaxed">
-                        ${prompt.codePreview ? prompt.codePreview.split('\n').map(line => 
-                            `<div>${line}</div>`
-                        ).join('') : ''}
+                    <div class="font-mono text-[10px] text-gray-400 leading-relaxed overflow-hidden">
+                        ${contentPreview}
                     </div>
                     <div class="mt-auto self-end">
-                        <span class="text-4xl text-white/5 font-display font-bold">PY</span>
+                        <span class="text-xs text-gray-600 font-display font-bold uppercase tracking-wider border border-gray-700 px-2 py-1 rounded">Code</span>
                     </div>
                 </div>
                 <div class="flex flex-col gap-0.5 px-1">

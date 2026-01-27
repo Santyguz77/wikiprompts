@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Eliminar Prompts GitHub - Wikiprompts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+</head>
+
+<body class="bg-gray-50 p-4 md:p-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
+            <div class="flex items-center gap-4 mb-6">
+                <button onclick="window.location.href='admin.html'"
+                    class="flex items-center justify-center size-10 rounded-full hover:bg-gray-100 transition-colors">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                </button>
+                <h1 class="text-3xl font-bold">🗑️ Eliminar Prompts de GitHub</h1>
+            </div>
+
+            <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-red-700">
+                            <strong>¡ADVERTENCIA!</strong> Esta acción eliminará TODOS los prompts importados desde
+                            GitHub.<br>
+                            Esta acción NO se puede deshacer.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-100 rounded-lg p-4 mb-6">
+                <h3 class="font-semibold mb-2">Información:</h3>
+                <p class="text-sm text-gray-700 mb-2">
+                    Se eliminarán todos los prompts cuyo ID comience con <code
+                        class="bg-white px-2 py-1 rounded">github-case-</code>
+                </p>
+                <p id="promptCount" class="text-sm text-gray-600">
+                    Cargando...
+                </p>
+            </div>
+
+            <button onclick="deleteGitHubPrompts()" id="deleteBtn"
+                class="w-full bg-red-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-red-700 transition-colors flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined">delete_forever</span>
+                Eliminar Todos los Prompts de GitHub
+            </button>
+
+            <div id="status" class="mt-6 hidden">
+                <div class="bg-gray-100 rounded-lg p-4">
+                    <h3 class="font-semibold mb-2">Estado:</h3>
+                    <pre id="statusText"
+                        class="text-sm text-gray-700 whitespace-pre-wrap max-h-96 overflow-y-auto"></pre>
+                </div>
+            </div>
+
+            <div id="results" class="mt-6 hidden">
+                <div class="bg-green-50 border-l-4 border-green-400 p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-green-700">
+                                <strong id="deleteCount">0</strong> prompts eliminados exitosamente
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://sentences-col-vice-antivirus.trycloudflare.com/api';
+
+        function log(message, isError = false) {
+            const statusDiv = document.getElementById('status');
+            const statusText = document.getElementById('statusText');
+            statusDiv.classList.remove('hidden');
+
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = isError ? '❌' : '✅';
+            statusText.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            statusText.scrollTop = statusText.scrollHeight;
+        }
+
+        async function loadPromptCount() {
+            try {
+                const prompts = await fetch(`${API_URL}/prompts`).then(r => r.json());
+                const githubPrompts = prompts.filter(p => p.id.startsWith('github-case-'));
+
+                document.getElementById('promptCount').innerHTML = `
+                    <strong>Total de prompts en la base de datos:</strong> ${prompts.length}<br>
+                    <strong class="text-red-600">Prompts de GitHub a eliminar:</strong> ${githubPrompts.length}
+                `;
+
+                if (githubPrompts.length === 0) {
+                    document.getElementById('deleteBtn').disabled = true;
+                    document.getElementById('deleteBtn').classList.add('opacity-50', 'cursor-not-allowed');
+                    document.getElementById('deleteBtn').innerHTML = '<span class="material-symbols-outlined">check_circle</span> No hay prompts de GitHub para eliminar';
+                }
+            } catch (error) {
+                console.error('Error cargando prompts:', error);
+                document.getElementById('promptCount').textContent = 'Error al cargar información';
+            }
+        }
+
+        async function deleteGitHubPrompts() {
+            if (!confirm('¿Estás COMPLETAMENTE seguro de que quieres eliminar TODOS los prompts de GitHub? Esta acción NO se puede deshacer.')) {
+                return;
+            }
+
+            // Limpiar estado anterior
+            document.getElementById('statusText').textContent = '';
+            document.getElementById('results').classList.add('hidden');
+            document.getElementById('deleteBtn').disabled = true;
+            document.getElementById('deleteBtn').classList.add('opacity-50', 'cursor-not-allowed');
+
+            let deletedCount = 0;
+
+            try {
+                log('Cargando prompts desde el servidor...');
+                const prompts = await fetch(`${API_URL}/prompts`).then(r => r.json());
+
+                // Filtrar prompts de GitHub
+                const githubPrompts = prompts.filter(p => p.id.startsWith('github-case-'));
+                const otherPrompts = prompts.filter(p => !p.id.startsWith('github-case-'));
+
+                log(`Encontrados ${githubPrompts.length} prompts de GitHub para eliminar`);
+                log(`Se mantendrán ${otherPrompts.length} prompts que no son de GitHub`);
+
+                if (githubPrompts.length === 0) {
+                    log('No hay prompts de GitHub para eliminar', true);
+                    return;
+                }
+
+                // Guardar solo los prompts que NO son de GitHub
+                log('Eliminando prompts de GitHub...');
+                await fetch(`${API_URL}/prompts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(otherPrompts)
+                });
+
+                deletedCount = githubPrompts.length;
+
+                // También eliminar comentarios, likes y bookmarks asociados
+                log('Limpiando comentarios asociados...');
+                const comments = await fetch(`${API_URL}/comments`).then(r => r.json());
+                const githubPromptIds = new Set(githubPrompts.map(p => p.id));
+                const cleanedComments = comments.filter(c => !githubPromptIds.has(c.promptId));
+                await fetch(`${API_URL}/comments`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(cleanedComments)
+                });
+
+                log('Limpiando likes asociados...');
+                const likes = await fetch(`${API_URL}/likes`).then(r => r.json());
+                const cleanedLikes = likes.filter(l => !githubPromptIds.has(l.promptId));
+                await fetch(`${API_URL}/likes`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(cleanedLikes)
+                });
+
+                log('Limpiando bookmarks asociados...');
+                const bookmarks = await fetch(`${API_URL}/bookmarks`).then(r => r.json());
+                const cleanedBookmarks = bookmarks.filter(b => !githubPromptIds.has(b.promptId));
+                await fetch(`${API_URL}/bookmarks`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(cleanedBookmarks)
+                });
+
+                // Mostrar resultados
+                document.getElementById('results').classList.remove('hidden');
+                document.getElementById('deleteCount').textContent = deletedCount;
+                log(`\n🎉 Eliminación completada: ${deletedCount} prompts de GitHub eliminados`);
+                log(`Prompts restantes en la base de datos: ${otherPrompts.length}`);
+
+                // Actualizar contador
+                setTimeout(() => loadPromptCount(), 1000);
+
+            } catch (error) {
+                log(`Error: ${error.message}`, true);
+                console.error('Error completo:', error);
+            } finally {
+                document.getElementById('deleteBtn').disabled = false;
+                document.getElementById('deleteBtn').classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        // Cargar contador al inicio
+        loadPromptCount();
+    </script>
+</body>
+
+</html>
