@@ -188,14 +188,90 @@ async function init() {
         AppState.prompts = [];
     }
 
+    // Restaurar estado si volvemos de un detalle
+    const restored = restoreState();
+
     // Actualizar UI con usuario actual
     updateUserUI();
 
-    // Renderizar prompts
+    // Renderizar prompts (esto usará el estado restaurado o el default)
     renderPrompts();
+
+    // Si hubo restauración, restaurar scroll después de renderizar
+    if (restored) {
+        setTimeout(() => {
+            window.scrollTo({
+                top: restored.scrollTop,
+                behavior: 'instant' // Usar instant para evitar el salto visual
+            });
+            // Limpiar estado para futuras navegaciones limpias
+            sessionStorage.removeItem('listState');
+        }, 100);
+    }
 
     // Configurar event listeners
     setupEventListeners();
+}
+
+// Guardar el estado actual antes de navegar
+function saveState() {
+    const state = {
+        scrollTop: window.scrollY,
+        currentPage: AppState.currentPage,
+        currentCategory: AppState.currentCategory,
+        searchQuery: AppState.searchQuery,
+        timestamp: Date.now()
+    };
+    sessionStorage.setItem('listState', JSON.stringify(state));
+}
+
+// Restaurar el estado guardado
+function restoreState() {
+    const savedState = sessionStorage.getItem('listState');
+    if (!savedState) return null;
+
+    try {
+        const state = JSON.parse(savedState);
+        // Validar que el estado sea reciente (opcional, ej: < 1 hora)
+        // Por ahora confiamos en la sesión
+
+        AppState.currentPage = state.currentPage || 1;
+        AppState.currentCategory = state.currentCategory || 'all';
+        AppState.searchQuery = state.searchQuery || '';
+
+        // Restaurar UI de filtros y búsqueda
+        restoreUI(state);
+
+        return state;
+    } catch (e) {
+        console.error('Error restaurando estado:', e);
+        return null;
+    }
+}
+
+// Restaurar interfaz visual (botones activos, inputs)
+function restoreUI(state) {
+    // Restaurar Search
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput && state.searchQuery) {
+        searchInput.value = state.searchQuery;
+    }
+
+    // Restaurar Categoría
+    if (state.currentCategory !== 'all') {
+        const categoryButtons = document.querySelectorAll('.category-btn');
+        categoryButtons.forEach(btn => {
+            if (btn.dataset.category === state.currentCategory) {
+                // Hacer activo
+                btn.classList.remove('bg-white', 'text-gray-500');
+                btn.classList.add('active', 'bg-black', 'text-white');
+            } else {
+                // Desactivar otros
+                btn.classList.remove('active', 'bg-black', 'text-white');
+                btn.classList.add('bg-white', 'text-gray-500');
+            }
+        });
+    }
 }
 
 // Actualizar UI con información del usuario
@@ -283,6 +359,8 @@ function setupEventListeners() {
     // Mobile navigation
     if (navHome) {
         navHome.addEventListener('click', () => {
+            // Si van a Home explicitamente, limpiar estado guardado si existiera
+            sessionStorage.removeItem('listState');
             window.location.href = 'index.html';
         });
     }
@@ -308,6 +386,7 @@ function setupEventListeners() {
     // Desktop navigation
     if (navHomeDesktop) {
         navHomeDesktop.addEventListener('click', () => {
+            sessionStorage.removeItem('listState');
             window.location.href = 'index.html';
         });
     }
@@ -577,12 +656,15 @@ function getCategoryLabel(category) {
 
 // Ver detalle de prompt
 function viewPrompt(promptId) {
+    // Guardar estado antes de salir
+    saveState();
+
     // Guardar el ID del prompt en sessionStorage para la página de detalle
     sessionStorage.setItem('currentPromptId', promptId);
     window.location.href = 'prompt-detail.html';
 }
 
-// Exponer funciones globalmente para que puedan ser usadas en onclick
+// Exponer funciones globalmente
 window.viewPrompt = viewPrompt;
 
 // Iniciar la aplicación cuando el DOM esté listo
