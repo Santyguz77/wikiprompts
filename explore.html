@@ -1,24 +1,32 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta name="theme-color" content="#000000"/>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#000000" />
     <title>Explorar - Wikiprompts</title>
-    
-    <link rel="manifest" href="/manifest.json"/>
-    <link rel="icon" type="image/png" href="/image.png"/>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    
+
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/png" href="/image.png" />
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5747426531124165"
+        crossorigin="anonymous"></script>
+
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script id="tailwind-config">
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        "primary": "#0a0a0a", 
+                        "primary": "#0a0a0a",
                         "secondary": "#666666",
                     },
                     fontFamily: {
@@ -35,8 +43,9 @@
 </head>
 
 <body class="bg-white text-gray-900 font-body">
-    <div class="relative mx-auto flex h-full min-h-screen w-full max-w-md lg:max-w-none flex-col overflow-x-hidden shadow-xl bg-white pb-28 lg:pb-8">
-        
+    <div
+        class="relative mx-auto flex h-full min-h-screen w-full max-w-md lg:max-w-none flex-col overflow-x-hidden shadow-xl bg-white pb-28 lg:pb-8">
+
         <!-- Header -->
         <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 p-4 lg:px-12">
             <div class="flex items-center justify-between">
@@ -44,21 +53,25 @@
                     <h1 class="text-2xl lg:text-3xl font-display font-bold tracking-tight">Explorar</h1>
                     <!-- Desktop Navigation -->
                     <nav class="hidden lg:flex items-center gap-2 ml-8">
-                        <button onclick="window.location.href='index.html'" class="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-gray-100 text-gray-600 transition-all">
+                        <button onclick="window.location.href='index.html'"
+                            class="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-gray-100 text-gray-600 transition-all">
                             <span class="material-symbols-outlined text-[20px]">home</span>
                             <span class="text-sm font-medium">Inicio</span>
                         </button>
-                        <button class="flex items-center gap-2 px-4 py-2 rounded-full bg-black text-white transition-all">
+                        <button
+                            class="flex items-center gap-2 px-4 py-2 rounded-full bg-black text-white transition-all">
                             <span class="material-symbols-outlined text-[20px]">explore</span>
                             <span class="text-sm font-medium">Explorar</span>
                         </button>
-                        <button onclick="window.location.href='bookmarks.html'" class="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-gray-100 text-gray-600 transition-all">
+                        <button onclick="window.location.href='bookmarks.html'"
+                            class="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-gray-100 text-gray-600 transition-all">
                             <span class="material-symbols-outlined text-[20px]">bookmark</span>
                             <span class="text-sm font-medium">Guardados</span>
                         </button>
                     </nav>
                 </div>
-                <button class="flex size-10 lg:size-12 items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
+                <button
+                    class="flex size-10 lg:size-12 items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
                     <span class="material-symbols-outlined">tune</span>
                 </button>
             </div>
@@ -71,7 +84,7 @@
                 <div class="flex items-center justify-between mb-5">
                     <h2 class="text-lg font-display font-bold text-gray-900">Tendencias</h2>
                 </div>
-                
+
                 <div id="trendingContainer" class="flex flex-col lg:grid lg:grid-cols-2 gap-3 lg:gap-4">
                     <!-- Se cargará dinámicamente -->
                 </div>
@@ -82,8 +95,9 @@
                 <div class="flex items-center justify-between mb-5">
                     <h2 class="text-lg lg:text-xl font-display font-bold text-gray-900">Más Populares</h2>
                 </div>
-                
-                <div id="popularPromptsGrid" class="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-5 lg:gap-x-6 gap-y-10 lg:gap-y-12">
+
+                <div id="popularPromptsGrid"
+                    class="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-5 lg:gap-x-6 gap-y-10 lg:gap-y-12">
                     <!-- Se cargará dinámicamente -->
                 </div>
             </section>
@@ -93,17 +107,19 @@
                 <div class="flex items-center justify-between mb-5">
                     <h2 class="text-lg lg:text-xl font-display font-bold text-gray-900">Creadores Populares</h2>
                 </div>
-                
+
                 <div id="creatorsContainer" class="flex overflow-x-auto gap-4 -mx-6 px-6 pb-2 no-scrollbar">
                     <!-- Se cargará dinámicamente -->
                 </div>
             </section>
 
             <!-- Creator Prompts Section -->
-            <section id="creatorPromptsSection" class="hidden px-6 lg:px-12 xl:px-24 py-6 lg:py-8 bg-gray-50 border-t border-gray-100">
+            <section id="creatorPromptsSection"
+                class="hidden px-6 lg:px-12 xl:px-24 py-6 lg:py-8 bg-gray-50 border-t border-gray-100">
                 <div class="flex items-center justify-between mb-5">
                     <div class="flex items-center gap-3">
-                        <button onclick="closeCreatorView()" class="flex items-center justify-center size-8 rounded-full hover:bg-gray-100 transition-colors">
+                        <button onclick="closeCreatorView()"
+                            class="flex items-center justify-center size-8 rounded-full hover:bg-gray-100 transition-colors">
                             <span class="material-symbols-outlined text-[20px]">arrow_back</span>
                         </button>
                         <div>
@@ -112,8 +128,9 @@
                         </div>
                     </div>
                 </div>
-                
-                <div id="creatorPromptsGrid" class="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-5 lg:gap-x-6 gap-y-10 lg:gap-y-12">
+
+                <div id="creatorPromptsGrid"
+                    class="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-5 lg:gap-x-6 gap-y-10 lg:gap-y-12">
                     <!-- Se cargará dinámicamente -->
                 </div>
             </section>
@@ -121,8 +138,9 @@
             <!-- Categories Deep Dive -->
             <section id="categoriesSection" class="px-6 lg:px-12 xl:px-24 py-6 lg:py-8">
                 <h2 class="text-lg lg:text-xl font-display font-bold text-gray-900 mb-5">Categorías</h2>
-                
-                <div id="categoriesGrid" class="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 lg:gap-4">
+
+                <div id="categoriesGrid"
+                    class="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 lg:gap-4">
                     <!-- Se cargará dinámicamente -->
                 </div>
             </section>
@@ -146,34 +164,43 @@
         </footer>
 
         <!-- Bottom Navigation (Mobile Only) -->
-        <nav class="lg:hidden fixed bottom-8 left-1/2 -translate-x-1/2 w-auto bg-white/80 backdrop-blur-xl border border-white/20 ring-1 ring-black/5 rounded-full shadow-subtle h-14 flex items-center justify-center px-2 gap-1 z-50">
-            <button onclick="window.location.href='index.html'" class="nav-btn flex items-center justify-center w-12 h-12 rounded-full hover:bg-black/5 text-gray-400 transition-all">
+        <nav
+            class="lg:hidden fixed bottom-8 left-1/2 -translate-x-1/2 w-auto bg-white/80 backdrop-blur-xl border border-white/20 ring-1 ring-black/5 rounded-full shadow-subtle h-14 flex items-center justify-center px-2 gap-1 z-50">
+            <button onclick="window.location.href='index.html'"
+                class="nav-btn flex items-center justify-center w-12 h-12 rounded-full hover:bg-black/5 text-gray-400 transition-all">
                 <span class="material-symbols-outlined text-[20px]">home</span>
             </button>
-            <button class="nav-btn flex items-center justify-center w-12 h-12 rounded-full bg-black text-white shadow-lg shadow-black/20 transition-all">
+            <button
+                class="nav-btn flex items-center justify-center w-12 h-12 rounded-full bg-black text-white shadow-lg shadow-black/20 transition-all">
                 <span class="material-symbols-outlined text-[20px]">explore</span>
             </button>
-            <button onclick="window.location.href='bookmarks.html'" class="nav-btn flex items-center justify-center w-12 h-12 rounded-full hover:bg-black/5 text-gray-400 transition-all">
+            <button onclick="window.location.href='bookmarks.html'"
+                class="nav-btn flex items-center justify-center w-12 h-12 rounded-full hover:bg-black/5 text-gray-400 transition-all">
                 <span class="material-symbols-outlined text-[20px]">bookmark</span>
             </button>
-            <button onclick="window.location.href='profile.html'" class="nav-btn flex items-center justify-center w-12 h-12 rounded-full hover:bg-black/5 text-gray-400 transition-all">
+            <button onclick="window.location.href='profile.html'"
+                class="nav-btn flex items-center justify-center w-12 h-12 rounded-full hover:bg-black/5 text-gray-400 transition-all">
                 <span class="material-symbols-outlined text-[20px]">person</span>
             </button>
         </nav>
 
         <!-- Floating Add Button -->
-        <button onclick="window.location.href='contribute.html'" class="fixed bottom-24 lg:bottom-8 right-6 lg:right-12 flex items-center justify-center size-14 lg:size-16 rounded-full bg-black text-white shadow-lg hover:scale-105 transition-transform hover:shadow-xl z-40">
+        <button onclick="window.location.href='contribute.html'"
+            class="fixed bottom-24 lg:bottom-8 right-6 lg:right-12 flex items-center justify-center size-14 lg:size-16 rounded-full bg-black text-white shadow-lg hover:scale-105 transition-transform hover:shadow-xl z-40">
             <span class="material-symbols-outlined text-[24px] lg:text-[28px]">add</span>
         </button>
 
         <!-- Gradient Fade at Bottom (Mobile Only) -->
-        <div class="lg:hidden fixed bottom-0 left-0 w-full h-24 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none z-40"></div>
+        <div
+            class="lg:hidden fixed bottom-0 left-0 w-full h-24 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none z-40">
+        </div>
     </div>
 
     <style>
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
+
         .no-scrollbar {
             -ms-overflow-style: none;
             scrollbar-width: none;
@@ -190,7 +217,7 @@
                 const response = await fetch(`${API_URL}/prompts`);
                 if (!response.ok) throw new Error('Error al cargar prompts');
                 prompts = await response.json();
-                
+
                 renderTrending();
                 renderPopularPrompts();
                 renderPopularCreators();
@@ -203,7 +230,7 @@
         // Crear tarjeta de prompt
         function createPromptCard(prompt) {
             const imageUrl = prompt.images?.[0] || prompt.imageUrl || '';
-            
+
             if (prompt.type === 'image') {
                 return `
                     <article class="group flex flex-col gap-3 cursor-pointer" onclick="viewPrompt('${prompt.id}')">
@@ -391,16 +418,16 @@
         // Mostrar prompts del creador
         function showCreatorPrompts(author) {
             const authorPrompts = prompts.filter(p => p.author === author);
-            
+
             document.getElementById('creatorName').textContent = author;
             document.getElementById('creatorPromptCount').textContent = `${authorPrompts.length} prompts publicados`;
-            
+
             const html = authorPrompts.map(prompt => createPromptCard(prompt)).join('');
             document.getElementById('creatorPromptsGrid').innerHTML = html;
-            
+
             document.getElementById('creatorPromptsSection').classList.remove('hidden');
             document.getElementById('categoriesSection').classList.add('hidden');
-            
+
             document.getElementById('creatorPromptsSection').scrollIntoView({ behavior: 'smooth' });
         }
 
@@ -427,4 +454,5 @@
         window.addEventListener('DOMContentLoaded', loadData);
     </script>
 </body>
+
 </html>

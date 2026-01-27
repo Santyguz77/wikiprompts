@@ -17,19 +17,12 @@ const AppState = {
 };
 
 // CONFIGURACIÓN DE PUBLICIDAD (ADSENSE)
-const GOOGLE_AD_CODE = `
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5747426531124165"
-     crossorigin="anonymous"></script>
-<ins class="adsbygoogle"
-     style="display:block"
-     data-ad-format="fluid"
-     data-ad-layout-key="-6t+ed+2i-1n-4w"
-     data-ad-client="ca-pub-5747426531124165"
-     data-ad-slot="3534077285"></ins>
-<script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
-</script>
-`;
+const ADSENSE_CONFIG = {
+    client: 'ca-pub-5747426531124165',
+    slot: '3534077285',
+    format: 'fluid',
+    layoutKey: '-6t+ed+2i-1n-4w'
+};
 
 // Verificar autenticación al cargar
 async function checkAuth() {
@@ -492,19 +485,40 @@ function renderPrompts() {
 
     grid.innerHTML = gridHTML;
 
+    // Inicializar anuncios de AdSense después de insertar en el DOM
+    setTimeout(() => {
+        const adsElements = grid.querySelectorAll('.adsbygoogle');
+        adsElements.forEach(ad => {
+            try {
+                if (!ad.hasAttribute('data-adsbygoogle-status')) {
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                }
+            } catch (e) {
+                console.log('AdSense initialization skipped:', e.message);
+            }
+        });
+    }, 100);
+
     // Renderizar Paginación
     renderPagination(paginationContainer, totalPages);
 }
 
 // Crear tarjeta de anuncio (Publicidad)
 function createAdCard() {
+    const adId = `ad-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     return `
         <article class="group flex flex-col gap-3 cursor-default">
             <div class="relative aspect-[3/4] rounded-2xl bg-gray-50 border border-gray-100 flex flex-col items-center justify-center overflow-hidden">
                 <span class="absolute top-3 right-3 text-[10px] font-bold text-gray-300 uppercase tracking-widest bg-white px-1.5 py-0.5 rounded shadow-sm z-10">Ad</span>
                 <!-- Google AdSense Container -->
-                <div class="w-full h-full flex items-center justify-center text-gray-300 text-xs text-center px-4 overflow-hidden relative">
-                     ${GOOGLE_AD_CODE}
+                <div class="w-full h-full flex items-center justify-center overflow-hidden">
+                    <ins class="adsbygoogle"
+                         id="${adId}"
+                         style="display:block;width:100%;height:100%;"
+                         data-ad-format="${ADSENSE_CONFIG.format}"
+                         data-ad-layout-key="${ADSENSE_CONFIG.layoutKey}"
+                         data-ad-client="${ADSENSE_CONFIG.client}"
+                         data-ad-slot="${ADSENSE_CONFIG.slot}"></ins>
                 </div>
             </div>
             <div class="flex flex-col gap-0.5 px-1 opacity-60">
@@ -703,3 +717,19 @@ if (document.readyState === 'loading') {
 } else {
     init();
 }
+
+// Registrar visita al sitio (analytics)
+async function registerVisit() {
+    try {
+        await fetch(`${API_URL}/analytics/visit`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        console.log('✅ Visita registrada');
+    } catch (error) {
+        console.log('Analytics not available:', error.message);
+    }
+}
+
+// Registrar visita al cargar la página
+registerVisit();

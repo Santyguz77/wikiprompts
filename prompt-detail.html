@@ -16,6 +16,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet" />
 
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5747426531124165"
+        crossorigin="anonymous"></script>
+
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script id="tailwind-config">
         tailwind.config = {
@@ -436,6 +440,9 @@
 
             // Check if bookmarked
             checkBookmarkStatus(prompt.id);
+
+            // Check if liked by current user
+            checkLikeStatus(prompt.id);
 
             // Load related prompts from same category
             loadRelatedPrompts(prompt.category, prompt.id);
@@ -909,6 +916,54 @@
                 alert('Error al guardar. Intenta de nuevo.');
                 // Revertir el icono
                 icon.style.fontVariationSettings = currentFill;
+            }
+        }
+
+        // Verificar estado de bookmark al cargar
+        async function checkBookmarkStatus(promptId) {
+            if (!checkAuth()) return;
+
+            try {
+                const bookmarks = await fetch(`${API_URL}/bookmarks`).then(r => r.json());
+                const userId = currentUser.id || currentUser.email;
+                const userBookmark = bookmarks.find(b => b.promptId === promptId && b.userId === userId);
+
+                const bookmarkBtn = document.getElementById('bookmarkBtn');
+                const icon = bookmarkBtn.querySelector('.material-symbols-outlined');
+
+                if (userBookmark) {
+                    icon.style.fontVariationSettings = "'FILL' 1";
+                } else {
+                    icon.style.fontVariationSettings = "'FILL' 0";
+                }
+            } catch (error) {
+                console.error('Error verificando bookmark:', error);
+            }
+        }
+
+        // Verificar estado de like al cargar
+        async function checkLikeStatus(promptId) {
+            if (!checkAuth()) return;
+
+            try {
+                const likes = await fetch(`${API_URL}/likes`).then(r => r.json());
+                const userId = currentUser.id || currentUser.email;
+                const userLike = likes.find(l => l.promptId === promptId && l.userId === userId);
+
+                const likeBtn = document.getElementById('likeBtn');
+                const icon = likeBtn.querySelector('.material-symbols-outlined');
+
+                if (userLike) {
+                    icon.style.fontVariationSettings = "'FILL' 1";
+                    likeBtn.classList.remove('text-gray-500');
+                    likeBtn.classList.add('text-red-500');
+                } else {
+                    icon.style.fontVariationSettings = "'FILL' 0";
+                    likeBtn.classList.remove('text-red-500');
+                    likeBtn.classList.add('text-gray-500');
+                }
+            } catch (error) {
+                console.error('Error verificando like:', error);
             }
         }
 

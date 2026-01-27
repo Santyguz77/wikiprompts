@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Importar Nano Banana (Español) - WikiPrompts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navbar -->
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center gap-4">
+                    <button onclick="window.location.href='admin.html'"
+                        class="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                    </button>
+                    <div class="flex items-center gap-3">
+                        <div class="bg-yellow-100 p-2 rounded-lg">
+                            <span class="material-symbols-outlined text-yellow-600">book_2</span>
+                        </div>
+                        <h1 class="text-xl font-bold text-gray-900">Importar Nano Banana (Español)</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-4 py-8">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900 mb-2">Configuración de Importación</h2>
+                <p class="text-gray-500 text-sm mb-6">
+                    Esta herramienta importará prompts desde el archivo README_es.md del repositorio
+                    Awesome-Nano-Banana-images.
+                </p>
+
+                <div class="grid gap-6 md:grid-cols-2">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">URL del Archivo RAW</label>
+                        <input type="text" id="repoUrl"
+                            value="https://raw.githubusercontent.com/PicoTrex/Awesome-Nano-Banana-images/main/README_es.md"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition-all text-sm font-mono text-gray-600 bg-gray-50">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Autor por Defecto</label>
+                        <input type="text" id="defaultAuthor" value="@Admin"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition-all text-sm">
+                        <label class="flex items-center gap-2 mt-2 text-xs text-gray-600">
+                            <input type="checkbox" id="overrideAuthor" checked
+                                class="rounded border-gray-300 text-yellow-500 focus:ring-yellow-500">
+                            Sobreescribir autores originales
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <label class="flex items-center gap-2 text-sm text-gray-700">
+                        <input type="checkbox" id="overwriteExisting" checked
+                            class="rounded border-gray-300 text-yellow-500 focus:ring-yellow-500">
+                        Forzar actualización de prompts existentes (Recomendado para corregir imágenes)
+                    </label>
+                </div>
+
+                <div class="mt-6 flex items-center justify-end gap-3">
+                    <div id="statusIndicator" class="hidden flex items-center gap-2 text-sm text-gray-600">
+                        <div class="w-4 h-4 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin">
+                        </div>
+                        <span>Procesando...</span>
+                    </div>
+                    <button onclick="startImport()" id="importBtn"
+                        class="flex items-center gap-2 px-4 py-2 bg-yellow-500 text-white rounded-lg text-sm font-semibold hover:bg-yellow-600 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span class="material-symbols-outlined text-[18px]">play_arrow</span>
+                        Iniciar Importación
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-6 bg-gray-50">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-semibold text-gray-900">Registro de Actividad</h3>
+                    <button onclick="clearLog()" class="text-xs text-gray-500 hover:text-gray-700">Limpiar log</button>
+                </div>
+                <div id="logContent"
+                    class="h-96 overflow-y-auto font-mono text-xs bg-white border border-gray-200 rounded-lg p-4 space-y-2">
+                    <div class="text-gray-400 italic">Esperando iniciar importación...</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Usar la URL persistente de Cloudflare para evitar errores de Mixed Content
+        const API_URL = 'https://sentences-col-vice-antivirus.trycloudflare.com/api';
+        const BASE_REPO_URL = 'https://raw.githubusercontent.com/PicoTrex/Awesome-Nano-Banana-images/main';
+
+        function log(message, type = 'info') {
+            const logContent = document.getElementById('logContent');
+            const timestamp = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+
+            let colorClass = 'text-gray-600';
+            let icon = 'ℹ️';
+
+            if (type === 'success') {
+                colorClass = 'text-green-600';
+                icon = '✅';
+            } else if (type === 'error') {
+                colorClass = 'text-red-600';
+                icon = '❌';
+            } else if (type === 'warning') {
+                colorClass = 'text-yellow-600';
+                icon = '⚠️';
+            }
+
+            div.className = `flex gap-2 ${colorClass}`;
+            div.innerHTML = `<span class="text-gray-400 shrink-0">[${timestamp}]</span> <span>${icon} ${message}</span>`;
+
+            logContent.appendChild(div);
+            logContent.scrollTop = logContent.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('logContent').innerHTML = '';
+        }
+
+        function extractCases(markdown) {
+            const cases = [];
+            // Regex ajustado para: ### Caso X: [Titulo](url)（por [@Autor](url)）
+            // Nota: El paréntesis de cierre después del autor puede ser de ancho completo '）' o normal ')'
+            const caseRegex = /###\s+(?:Caso|Ejemplo)\s+(\d+):\s+\[(.*?)\]\((.*?)\).*?por\s+\[(.*?)\]/g;
+
+            let match;
+            while ((match = caseRegex.exec(markdown)) !== null) {
+                const [fullMatch, number, title, url, author] = match;
+
+                // Buscar el bloque de código siguiente para el prompt
+                const remainder = markdown.slice(match.index + fullMatch.length);
+                const codeBlockMatch = remainder.match(/```([\s\S]*?)```/);
+
+                if (codeBlockMatch) {
+                    const prompt = codeBlockMatch[1].trim();
+                    // No asumimos URL aquí, la validaremos dinámicamente
+                    cases.push({
+                        number,
+                        title,
+                        author,
+                        prompt
+                    });
+                }
+            }
+            return cases;
+        }
+
+        async function findValidImage(caseNumber) {
+            const candidates = [
+                `images/case${caseNumber}/output.jpg`,
+                `images/case${caseNumber}/case.jpg`,
+                `images/case${caseNumber}/output0.jpg`,
+                `images/case${caseNumber}/output1.jpg`,
+                `images/case${caseNumber}/output2.jpg`,
+                `images/case${caseNumber}/0.jpg` // Algunos repos raros usan números simples
+            ];
+
+            for (const path of candidates) {
+                const url = `${BASE_REPO_URL}/${path}`;
+                try {
+                    // Usar fetch HEAD para ser ligero, si falla usar GET
+                    const response = await fetch(url, { method: 'HEAD' });
+                    if (response.ok) {
+                        return url;
+                    }
+                } catch (e) {
+                    // Fallo silencioso, probar siguiente
+                }
+            }
+            return null; // No se encontró
+        }
+
+        async function startImport() {
+            const repoUrl = document.getElementById('repoUrl').value;
+            const defaultAuthor = document.getElementById('defaultAuthor').value;
+            const overwrite = document.getElementById('overwriteExisting').checked;
+            const overrideAuthor = document.getElementById('overrideAuthor').checked;
+            const btn = document.getElementById('importBtn');
+            const status = document.getElementById('statusIndicator');
+
+            btn.disabled = true;
+            status.classList.remove('hidden');
+            clearLog();
+
+            let totalImported = 0;
+            let totalSkipped = 0;
+
+            try {
+                log('Descargando README_es.md...');
+                const response = await fetch(repoUrl);
+                if (!response.ok) throw new Error(`Error HTTP ${response.status}`);
+                const markdown = await response.text();
+
+                log(`Archivo descargado (${markdown.length} bytes). Analizando casos...`);
+                const cases = extractCases(markdown);
+                log(`Encontrados ${cases.length} casos potenciales.`, 'success');
+
+                if (cases.length === 0) {
+                    throw new Error('No se encontraron casos con el formato esperado "### Caso X: ..."');
+                }
+
+                // Obtener prompts existentes para evitar duplicados
+                const existingPrompts = await fetch(`${API_URL}/prompts`).then(r => r.json()).catch(() => []);
+                const existingIds = new Set(existingPrompts.map(p => p.id));
+
+                for (const caseData of cases) {
+                    const promptId = `nano-es-${caseData.number}`; // ID único para esta colección
+
+                    // Si existe y NO queremos sobrescribir, saltar
+                    if (existingIds.has(promptId) && !overwrite) {
+                        log(`Saltando Caso ${caseData.number} (ya existe)`, 'warning');
+                        totalSkipped++;
+                        continue;
+                    }
+
+                    // Buscar imagen válida
+                    log(`Buscando imagen para Caso ${caseData.number}...`);
+                    const validImageUrl = await findValidImage(caseData.number);
+
+                    if (!validImageUrl) {
+                        log(`⚠️ No se encontró imagen para Caso ${caseData.number}, usando placeholder o vacío`, 'warning');
+                    }
+
+                    // Determinar autor
+                    let finalAuthor;
+                    if (overrideAuthor) {
+                        finalAuthor = defaultAuthor;
+                    } else {
+                        finalAuthor = caseData.author.startsWith('@') ? caseData.author : `@${caseData.author}`;
+                    }
+
+                    const promptData = {
+                        id: promptId,
+                        title: caseData.title,
+                        category: 'visuals',
+                        type: 'image',
+                        model: 'Nano Banana', // Modelo específico
+                        prompt: caseData.prompt,
+                        description: `Caso ${caseData.number} de Awesome-Nano-Banana (Español)`,
+                        author: finalAuthor,
+                        likes: 0,
+                        views: 0,
+                        createdAt: new Date().toISOString(),
+                        imageUrl: validImageUrl || '', // Vacío si no hay, la app lo mandará al final
+                        tags: ['nano-banana', 'spanish']
+                    };
+
+                    try {
+                        await fetch(`${API_URL}/prompts/${promptData.id}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(promptData)
+                        });
+                        const action = existingIds.has(promptId) ? 'Actualizado' : 'Guardado';
+                        log(`${action} Caso ${caseData.number}: ${caseData.title} (${validImageUrl ? 'Con Imagen' : 'Sin Imagen'})`, 'success');
+                        totalImported++;
+                    } catch (e) {
+                        log(`Error guardando Caso ${caseData.number}: ${e.message}`, 'error');
+                    }
+
+                    // Pequeña pausa para no saturar
+                    // await new Promise(r => setTimeout(r, 50)); 
+                }
+
+                log(`Importación finalizada. Procesados: ${totalImported}, Saltados: ${totalSkipped}`, 'success');
+
+            } catch (error) {
+                log(`Error general: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                status.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+
+</html>
