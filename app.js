@@ -549,14 +549,16 @@ function createPromptCard(prompt) {
 }
 
 // Crear tarjeta de agregar
+// Crear tarjeta de agregar
 function createAddCard() {
     return `
         <article class="group flex flex-col gap-3 cursor-pointer" onclick="window.location.href='contribute.html'">
-            <div class="relative aspect-[3/4] rounded-2xl border border-dashed border-gray-300 flex flex-col items-center justify-center hover:bg-gray-50 hover:border-gray-400 transition-all">
-                <div class="size-10 rounded-full bg-gray-50 flex items-center justify-center mb-2 group-hover:bg-white group-hover:shadow-sm transition-all">
-                    <span class="material-symbols-outlined text-gray-400 text-xl group-hover:text-black transition-colors">add</span>
+            <div class="relative aspect-[3/4] rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center hover:bg-gray-50 hover:border-black transition-all bg-white group-hover:shadow-md">
+                <div class="size-14 rounded-full bg-gray-50 flex items-center justify-center mb-4 group-hover:bg-black group-hover:scale-110 transition-all duration-300">
+                    <span class="material-symbols-outlined text-gray-400 text-3xl group-hover:text-white transition-colors">post_add</span>
                 </div>
-                <span class="font-display font-medium text-xs text-gray-400 group-hover:text-black">Submit</span>
+                <h3 class="font-display font-bold text-sm text-gray-900 mb-1 group-hover:translate-y-[-2px] transition-transform">Subir Prompt</h3>
+                <span class="text-xs text-gray-400 text-center px-4 leading-relaxed group-hover:text-gray-600 transition-colors">Comparte tu creatividad con la comunidad</span>
             </div>
         </article>
     `;

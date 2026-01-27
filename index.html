@@ -9,7 +9,7 @@
 
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" type="image/png" href="/image.png" />
-    <link rel="apple-touch-icon" href="/image.png" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
 
     <link href="https://fonts.googleapis.com" rel="preconnect" />
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
@@ -108,6 +108,13 @@
                         <span class="text-sm font-medium">Guardados</span>
                     </button>
                 </nav>
+                <!-- Botón Subir Prompt (Desktop) -->
+                <button onclick="window.location.href='contribute.html'"
+                    class="hidden lg:flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white rounded-full text-sm font-bold hover:bg-black hover:shadow-lg hover:-translate-y-0.5 transition-all ml-2">
+                    <span class="material-symbols-outlined text-[20px]">post_add</span>
+                    <span>Subir Prompt</span>
+                </button>
+
                 <button id="profileBtn" class="relative group">
                     <div
                         class="size-8 lg:size-10 rounded-full overflow-hidden ring-1 ring-gray-100 group-hover:ring-gray-300 transition-all bg-gray-200 flex items-center justify-center">
@@ -225,9 +232,10 @@
         </nav>
 
         <!-- Floating Add Button -->
-        <button id="addPromptBtn"
-            class="fixed bottom-24 lg:bottom-8 right-6 lg:right-12 flex items-center justify-center size-14 lg:size-16 rounded-full bg-black text-white shadow-lg hover:scale-105 transition-transform hover:shadow-xl z-40">
-            <span class="material-symbols-outlined text-[24px] lg:text-[28px]">add</span>
+        <!-- Floating Add Button (Mobile Only) -->
+        <button id="addPromptBtn" onclick="window.location.href='contribute.html'"
+            class="lg:hidden fixed bottom-24 right-6 flex items-center justify-center size-14 rounded-full bg-black text-white shadow-lg hover:scale-105 transition-transform hover:shadow-xl z-40 active:scale-95">
+            <span class="material-symbols-outlined text-[26px]">post_add</span>
         </button>
 
         <!-- Gradient Fade at Bottom (Mobile Only) -->
